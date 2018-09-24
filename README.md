@@ -11,6 +11,7 @@ Targets Node.js 6 or later.
 - [Tag Property Definitions](#tag-property-definitions)
 - [Options](#options)
 - [Events](#events)
+- [Defining Zones](#defining-zones)
 
 ## Install
 
@@ -152,4 +153,43 @@ Emitted when a tag enters or exits a zone. See data definition below.
   "type": String;
   tag: Object; // see Tag Property Definitions for details
 }
+```
+
+## Defining Zones
+
+When creating options for a connector to use, it's possible to provide an array of custom zone definitions that will be sent to the Wiser instance and used for geofencing. Only the zone `name` and `shape` are required used, so providing other options like `id` or `color` are uneccessary (and ignored).
+
+IMPORTANT NOTE: The `id` for custom zones start at `1000`. If the Wiser instance is using a configuration file that has _more than 1000_ zones (highly unlikely), there will be unpredictable issues with the geofencing.
+
+```js
+const wc = require('wiser-connector');
+const connector = wc.createConnector();
+
+// two adjacent zones that are 100x100 inches
+const zones = [
+  {
+    name: 'Custom Zone A',
+    shape: [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 100, y: 100 },
+      { x: 0, y: 100 }
+    ]
+  },
+  {
+    name: 'Custom Zone B',
+    shape: [
+      { x: 100, y: 0 },
+      { x: 200, y: 0 },
+      { x: 200, y: 100 },
+      { x: 100, y: 100 }
+    ]
+  }
+];
+
+connector.start({
+  hostname: '127.0.0.1',
+  port: 3101,
+  zones: zones
+});
 ```
