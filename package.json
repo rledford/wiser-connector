@@ -1,7 +1,7 @@
 {
   "name": "wiser-connector",
   "version": "1.0.0",
-  "description": "Creates a connector to a Wiser REST API and reports tag position updates and zone transitions. The connector can be provided zone definitions that will be created in the Wiser application to use for geofencing.",
+  "description": "Creates a connector to a Wiser REST API and reports tag position updates and zone transitions. The connector can be configured with custom zone definitions that will be sent to the Wiser instance for geofencing.",
   "main": "index.js",
   "scripts": {
     "test": "node ./test/test.js"
