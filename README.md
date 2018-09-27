@@ -162,11 +162,15 @@ Example
 
 Emitted after a connector's `status` method or command is executed. The data contains the current hardware status information returned from the Wiser REST API.
 
+```js
+// Example coming soon
+```
+
 ## Defining Zones
 
 When creating options for a connector to use, it's possible to provide an array of custom zone definitions that will be sent to the Wiser instance and used for geofencing. Only the zone `name` and `shape` are required, `color` is optional. Providing a zone `id` is uneccessary (and ignored).
 
-At this time, the Wiser REST API does not support DELETE requests for zones, so providing custom zones is not recommended at this time since they cannot be fully managed by the connector. For example, if you define 5 custom zones, you will be able to edit them and restart the connector to update the Wiser instance, but if you remove one or more, they will still exist in the Wiser instance, so you will still see zone transitions for zones you've removed from the connector.
+At this time, the Wiser REST API does not support DELETE requests for zones, so providing custom zones is not recommended since they cannot be fully managed by the connector. For example, if you define 5 custom zones, you will be able to edit them and restart the connector to update the Wiser instance, but if you remove one or more, they will still exist in the Wiser instance, so you will still see zone transitions for zones you've removed from the connector.
 
 IMPORTANT NOTE: The `id` for custom zones start at `1000`. If the Wiser instance is using a configuration file that has _more than 1000_ zones (highly unlikely), some of the zones in the Wiser instance will be overwritten by the custom zones.
 
