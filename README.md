@@ -126,19 +126,11 @@ Example:
 
 ## Events
 
-### start
-
-Emitted when the connector starts. No Data.
-
-### shutdown
-
-Emitted when the connector shuts down. No Data.
-
 ### tagUpdate
 
 Emitted when a tag updates. See [Tag Property Definitions](#tag-property-definitions).
 
-### tagZoneTransition
+### zoneTransition
 
 Emitted when a tag enters or exits a zone. See data definition below.
 
@@ -148,12 +140,28 @@ Emitted when a tag enters or exits a zone. See data definition below.
 | `tag`    | `Object` | The raw tag report data for the tag that transitioned zones. |
 | `zone`   | `String` | The name of the zone where the transition occured.           |
 
+Example
+
 ```js
 {
-  "type": String;
-  tag: Object; // see Tag Property Definitions for details
+  type: 'enter',
+  tag: {
+    id: 0,
+    tag: 31000,
+    location: {x: 0, y: 0, z: 0},
+    zones: [{id: 0, id: 1}],
+    error: 0.0,
+    anchors: 5,
+    timestamp: 143456789,
+    battery: 3.1
+  },
+  zone: 'Zone A'
 }
 ```
+
+### status
+
+Emitted after a connector's `status` method or command is executed. The data contains the current hardware status information returned from the Wiser REST API.
 
 ## Defining Zones
 
