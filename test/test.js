@@ -7,11 +7,8 @@ const connector = wc.createConnector();
 // two adjacent zones that are 100x100 inches
 const zones = [
   {
-    name: 123,
-    shape: []
-  },
-  {
     name: 'Custom Zone A',
+    color: '#333',
     shape: [
       { x: 0, y: 0 },
       { x: 100, y: 0 },
@@ -21,6 +18,7 @@ const zones = [
   },
   {
     name: 'Custom Zone B',
+    color: '#f5f5f5',
     shape: [
       { x: 100, y: 0 },
       { x: 200, y: 0 },
@@ -34,14 +32,14 @@ connector.on('error', err => {
   console.log(err);
 });
 connector.on('tagUpdate', tag => {
-  //console.log('tag update', tag);
+  console.log('tag update', tag);
 });
-connector.on('tagZoneTransition', transition => {
+connector.on('zoneTransition', transition => {
   console.log('tag zone transition', transition);
 });
 
 connector.start({
-  reportTagZoneTransitions: true,
+  reportZoneTransitions: true,
   reportTagUpdates: false,
   updateInterval: 2000,
   zones
