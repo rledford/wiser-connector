@@ -91,7 +91,6 @@ connector.send({
 | reportTagUpdates      | `Boolean` | `true`           | Report when a tag updates.                                                                                                                            |
 | reportZoneTransitions | `Boolean` | `true`           | Report when tags enter or exit zones.                                                                                                                 |
 | updateInterval        | `Number`  | `500`            | The time, in milliseconds, that requests will be sent to the Wiser REST API. The requests are only made after the previous request has been processed |
-| healthCheckInterval   | `Number`  | `300000`         | The time, in milliseconds, that a health report will be requested from the Wiser REST API.                                                            |
 | zones                 | `Array`   | `[]`             | The custom zone definitions that will be sent to the Wiser instance to use for geofencing. See [Defining Zones](#defining-zones).                     |
 
 ---
