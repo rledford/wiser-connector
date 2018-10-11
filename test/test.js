@@ -4,6 +4,8 @@ const wc = require('../lib/wiser-connector');
 
 const connector = wc.createConnector();
 
+const { HOSTNAME, PORT } = process.env;
+
 // two adjacent zones that are 100x100 inches
 const zones = [
   {
@@ -39,6 +41,8 @@ connector.on('zoneTransition', transition => {
 });
 
 connector.start({
+  hostname: HOSTNAME || '127.0.0.1',
+  port: PORT ? parseInt(PORT) : 3101,
   reportZoneTransitions: true,
   reportTagUpdates: false,
   updateInterval: 2000,
