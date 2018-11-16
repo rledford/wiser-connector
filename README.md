@@ -133,11 +133,11 @@ Emitted when a tag updates. See [Tag Property Definitions](#tag-property-definit
 
 Emitted when a tag enters or exits a zone. See data definition below.
 
-| Property | Type     | Description                                                  |
-| -------- | -------- | ------------------------------------------------------------ |
-| `type`   | `String` | Will be either `enter` or `exit`                             |
-| `tag`    | `Object` | The raw tag report data for the tag that transitioned zones. |
-| `zone`   | `String` | The name of the zone where the transition occured.           |
+| Property | Type     | Description                                                              |
+| -------- | -------- | ------------------------------------------------------------------------ |
+| `type`   | `String` | Will be either `enter` or `exit`                                         |
+| `tag`    | `Object` | The raw tag report data for the tag that transitioned zones.             |
+| `zone`   | `Object` | Contains the Wiser id and name of the zone where the transition occured. |
 
 Example
 
@@ -154,7 +154,10 @@ Example
     timestamp: 143456789,
     battery: 3.1
   },
-  zone: 'Zone A'
+  zone: {
+    id: 0,
+    name: 'Zone A'
+  }
 }
 ```
 
