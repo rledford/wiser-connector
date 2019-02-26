@@ -182,12 +182,14 @@ Emitted after a connector's `status` method or command is executed. The data con
     }
   ],
   gateways: [
-    id: 0,
-    ipv4: '127.0.0.1',
-    port: 3101,
-    x: 0,
-    y: 0,
-    z: 0
+    {
+      id: 0,
+      ipv4: '127.0.0.1',
+      port: 3101,
+      x: 0,
+      y: 0,
+      z: 0
+    }
   ],
   adapters: [
     {
