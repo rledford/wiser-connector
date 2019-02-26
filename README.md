@@ -197,7 +197,7 @@ Example:
 {x: 10.2, y: 256.9, z: 34.0}
 ```
 
-The `zones` property is an array that contains object literals which identify the zone that the tag is detected in. The `id` references the zone's index in the array of zones returned from the `/wiser/api/zone` endpoint.
+The `zones` property is an array that contains object literals which identify the zone that the tag is detected in.
 
 Example:
 
