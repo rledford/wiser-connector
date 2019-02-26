@@ -8,7 +8,9 @@
     "test": "node ./test",
     "build": "rm -r ./dist; tsc"
   },
-  "files": ["/dist"],
+  "files": [
+    "/dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rledford/wiser-connector.git"
@@ -26,7 +28,7 @@
     "connector"
   ],
   "author": "rledford",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/rledford/wiser-connector/issues"
   },
