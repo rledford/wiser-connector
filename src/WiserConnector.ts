@@ -170,7 +170,6 @@ class WiserConnector extends EventEmitter {
               }
             });
 
-            // apply updates
             Object.assign(this.trackerTags[tag.tag], tag);
 
             if (this.tagHeartbeats[tag.tag]) {
@@ -208,9 +207,6 @@ class WiserConnector extends EventEmitter {
     setTimeout(this.__update.bind(this), nextUpdateTimeout);
   }
 
-  /**
-   * Sends a request to /wiser/api/arena to get the current status information and emits the status data. Listeners should be registered to the 'status' event.
-   */
   async status() {
     try {
       const status: Arena = await getArena(this);
@@ -220,12 +216,6 @@ class WiserConnector extends EventEmitter {
     }
   }
 
-  /**
-   *
-   * @param {Object} options - runtime options
-   *
-   * Starts the connector using the provided options
-   */
   start(options: ConnectorOptions) {
     Object.assign(this, defaultOptions, options);
     if (this.started) {
@@ -237,9 +227,6 @@ class WiserConnector extends EventEmitter {
     setTimeout(this.__update.bind(this), this.tagSampleRate);
   }
 
-  /**
-   * Shuts down the connector
-   */
   shutdown() {
     this.started = false;
     clearTimeout(this.tagSampleTimeoutHandle);

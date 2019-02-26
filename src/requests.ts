@@ -5,9 +5,6 @@ import { WiserConnector } from './WiserConnector';
 
 const DEFAULT_TIMEOUT = 5000;
 
-/**
- * @param {RequestConfig} config
- */
 function getJSON(config: RequestConfig) {
   return new Promise<any>((resolve, reject) => {
     const request: Function = config.tlsEnabled ? https.request : http.request;
@@ -49,10 +46,6 @@ function getJSON(config: RequestConfig) {
   });
 }
 
-/**
- * @param {RequestConfig} config
- * @param {Object} data request body
- */
 function postJSON(config: RequestConfig, data: object) {
   return new Promise<any>((resolve, reject) => {
     let payload;
@@ -100,10 +93,6 @@ function postJSON(config: RequestConfig, data: object) {
   });
 }
 
-/**
- * GET - wiser api endpoint to check availablility
- * @param {WiserConnector} connector
- */
 function isServerAvailable(connector: WiserConnector): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const config: any = {
@@ -149,10 +138,6 @@ function isServerAvailable(connector: WiserConnector): Promise<boolean> {
   });
 }
 
-/**
- * GET - passive tag report
- * @param {WiserConnector} connector
- */
 function getPassiveTagReport(connector: WiserConnector): Promise<Tag[]> {
   return getJSON({
     method: 'GET',
@@ -166,10 +151,6 @@ function getPassiveTagReport(connector: WiserConnector): Promise<Tag[]> {
   });
 }
 
-/**
- * Get arena info including health statuses
- * @param {WiserConnector} connector
- */
 function getArena(connector: WiserConnector): Promise<Arena> {
   return getJSON({
     method: 'GET',
@@ -183,10 +164,6 @@ function getArena(connector: WiserConnector): Promise<Arena> {
   });
 }
 
-/**
- * GET zone definitions
- * @param {WiserConnector} connector
- */
 function getZones(connector: WiserConnector): Promise<Zone[]> {
   return getJSON({
     method: 'GET',
@@ -200,11 +177,6 @@ function getZones(connector: WiserConnector): Promise<Zone[]> {
   });
 }
 
-/**
- * POST - create zone
- * @param {WiserConnector} connector
- * @param {Zone} zone
- */
 function createZone(connector: WiserConnector, zone: Zone) {
   return postJSON(
     {
