@@ -168,4 +168,33 @@ Emitted after a connector's `status` method or command is executed. The data con
 
 ```js
 // Example
+{
+  panId: 0,
+  anchors: [
+    {
+      id: 0,
+      hardwareId: 0,
+      firmwareVersion: '0.0.0',
+      health: 'Alive',
+      x: 0,
+      y: 0,
+      z: 0
+    }
+  ],
+  gateways: [
+    id: 0,
+    ipv4: '127.0.0.1',
+    port: 3101,
+    x: 0,
+    y: 0,
+    z: 0
+  ],
+  adapters: [
+    {
+      id: 0,
+      usbAnchor: 0,
+      downstreamAdapter: 0
+    }
+  ]
+}
 ```
