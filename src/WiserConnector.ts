@@ -17,7 +17,7 @@ const maxRequestErrorDelayMultiplier = 5;
 let requestErrorDelayMultiplier = 0;
 
 class WiserConnector extends EventEmitter {
-  id: string;
+  private id: string;
   private hostname: string;
   private port: number;
   private tlsEnabled: boolean;
@@ -59,8 +59,8 @@ class WiserConnector extends EventEmitter {
             break;
           case 'status':
             processInstance.status();
-          case 'stop':
-            processInstance.stop();
+          case 'shutdown':
+            processInstance.shutdown();
             break;
           default:
             console.log(`${this.id} :: unknown command ${command}`);
@@ -69,6 +69,9 @@ class WiserConnector extends EventEmitter {
     }
   }
 
+  getId(): string {
+    return this.id;
+  }
   getHostname(): string {
     return this.hostname;
   }
@@ -83,6 +86,9 @@ class WiserConnector extends EventEmitter {
   }
 
   private __emitEventMessage(event: string, message: any) {
+    if (event === 'error ' && this.listenerCount('error') === 0) {
+      return;
+    }
     if (isChildProcess && process.send) {
       process.send({
         event,
@@ -234,7 +240,7 @@ class WiserConnector extends EventEmitter {
   /**
    * Shuts down the connector
    */
-  stop() {
+  shutdown() {
     this.started = false;
     clearTimeout(this.tagSampleTimeoutHandle);
   }

@@ -33,14 +33,14 @@ const connector = new WiserConnector();
 // start the connector
 connector.start({
   hostname: '127.0.0.1',
-  sampleRate: 500, // tag data will be checked every 0.5 seconds
+  tagSampleRate: 500, // tag data will be checked every 0.5 seconds
   tagHeartbeat: 1000, // tag updates are reported at most once per second
   port: 3101
 });
 
 // listen for events
-connector.on(WiserConnector.events.tagHeartbeat, data => {
-  console.log(data);
+connector.on(WiserConnector.events.tagHeartbeat, message => {
+  console.log(message);
 });
 
 // stop the connector
@@ -81,27 +81,28 @@ connector.send({
 
 ## Options
 
-| Name          | Type     | Default          | Description                                                                   |
-| ------------- | -------- | ---------------- | ----------------------------------------------------------------------------- |
-| id            | `String` | `WiserConnector` | The identifier to use for the connector.                                      |
-| hostname      | `String` | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                         |
-| port          | `Number` | `3101`           | The TCP port to use to connect to the Wiser REST API.                         |
-| tagSampleRate | `Number` | `1000`           | How often the connector should sample tag data.                               |
-| tagHeartbeat  | `Number` | `60000`          | How often tag location changes are reported, independent of zone transitions. |
+| Name          | Type      | Default          | Description                                                                   |
+| ------------- | --------- | ---------------- | ----------------------------------------------------------------------------- |
+| id            | `String`  | `WiserConnector` | The identifier to use for the connector.                                      |
+| hostname      | `String`  | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                         |
+| port          | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                         |
+| tlsEnabled    | `Boolean` | `false`          | If true, the connector will use https to connect to the Wiser REST API.       |
+| tagSampleRate | `Number`  | `1000`           | How often the connector should sample tag data.                               |
+| tagHeartbeat  | `Number`  | `60000`          | How often tag location changes are reported, independent of zone transitions. |
 
 ---
 
 ## Tag Property Definitions
 
-| Property    | Type     | Description                                                                    |
-| ----------- | -------- | ------------------------------------------------------------------------------ |
-| `id`        | `Number` | The unique id of the tag report.                                               |
-| `error`     | `Number` | The estimated error in location calculation.                                   |
-| `location`  | `Object` | {x: Number, y: Number, z: Number}                                              |
-| `tag`       | `Number` | An integer used to identify the tag. Usually printed on the tag in hex format. |
-| `timestamp` | `Number` | Unix time in milliseconds.                                                     |
-| `battery`   | `Number` | The current battery voltage of the tag. Anything below 2.8 is considered low.  |
-| `zones`     | `Array`  | A list of zone IDs that the tag is reported to be in.                          |
+| Property  | Type       | Description                                                                    |
+| --------- | ---------- | ------------------------------------------------------------------------------ |
+| id        | `Number`   | The unique id of the tag report.                                               |
+| error     | `Number`   | The estimated error in location calculation.                                   |
+| location  | `Object`   | Location coordinates `{x: Number, y: Number, z: Number}`.                      |
+| tag       | `Number`   | An integer used to identify the tag. Usually printed on the tag in hex format. |
+| timestamp | `Number`   | Unix time in milliseconds.                                                     |
+| battery   | `Number`   | The current battery voltage of the tag. Anything below 2.8 is considered low.  |
+| zones     | `[Object]` | A list of zone IDs `{id: number}` that the tag is reported to be in.           |
 
 The location property is an object literal that defines the x, y, and z coordinates for the tag position.
 
@@ -127,7 +128,7 @@ Register for events using the values defined in `WiserConnector.events` or use t
 
 Emitted when a tag updates and the time since the last heartbeat exceeds the configured `tagHeartbeat` value. See [Tag Property Definitions](#tag-property-definitions).
 
-TIP: Settings `tagHeartbeat` to `0` will cause every tag update to be reported.
+TIP: Setting `tagHeartbeat` to `0` will cause every tag update to be reported.
 
 ### tagZoneChanged
 
@@ -135,7 +136,7 @@ Emitted when a tag enters or exits a zone. See data definition below.
 
 | Property | Type     | Description                                                              |
 | -------- | -------- | ------------------------------------------------------------------------ |
-| `type`   | `String` | Will be either `enter` or `exit`                                         |
+| `type`   | `String` | Will be either `'enter'` or `'exit'`                                     |
 | `tag`    | `Object` | The raw tag report data for the tag that transitioned zones.             |
 | `zone`   | `Object` | Contains the Wiser id and name of the zone where the transition occured. |
 
@@ -163,7 +164,7 @@ Example
 
 ### status
 
-Emitted after a connector's `status` method or command is executed. The data contains the current hardware status information returned from the Wiser REST API.
+Emitted after a connector's `status` method or command is executed. The data contains the current hardware status information returned from the Wiser REST API `/wiser/api/arena` endpoint.
 
 ```js
 // Example
