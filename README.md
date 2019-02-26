@@ -1,6 +1,6 @@
 ## wiser-connector
 
-Creates a connector that samples data from a Wiser REST API and reports tag location updates and zone transitions.
+Samples data from a Wiser Tracker REST API and reports tag location updates and zone transitions.
 
 Targets ES6+.
 
