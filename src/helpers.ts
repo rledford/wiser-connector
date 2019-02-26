@@ -1,4 +1,4 @@
-'use strict';
+import { Tag } from './types';
 
 /**
  *
@@ -6,13 +6,13 @@
  *
  * Sorts the tag rerpot by timestamp, in ascending order, and removes duplicate tag ID entries so that only the most current tag data is in the report. Manipulates the source tagReport array.
  */
-function uniqueFilterTagReport(tagReport) {
+function uniqueFilterTagReport(tagReport: Tag[]) {
   // sort ascending
   tagReport.sort((a, b) => {
     return a.timestamp <= b.timestamp ? -1 : 1;
   });
 
-  let unique = {};
+  let unique: { [prop: string]: boolean } = {};
 
   // remove out-of-date duplicates
   for (let i = tagReport.length - 1; i > -1; i--) {
@@ -32,20 +32,16 @@ function uniqueFilterTagReport(tagReport) {
  *
  * Returns an Object {enter: [id...], exit: [id...]} describing what transitions occured
  */
-function getZoneTransitions(lastIdList = [], nextIdList = []) {
-  let enter, exit;
-
-  enter = nextIdList.filter(id => {
-    return lastIdList.indexOf(id) === -1;
-  });
-  exit = lastIdList.filter(id => {
-    return nextIdList.indexOf(id) === -1;
-  });
+function getZoneTransitions(
+  lastIdList: number[],
+  nextIdList: number[]
+): { enter: number[]; exit: number[] } {
+  const enter: number[] = nextIdList.filter(
+    id => lastIdList.indexOf(id) === -1
+  );
+  const exit: number[] = lastIdList.filter(id => nextIdList.indexOf(id) === -1);
 
   return { enter, exit };
 }
 
-module.exports = {
-  uniqueFilterTagReport,
-  getZoneTransitions
-};
+export { uniqueFilterTagReport, getZoneTransitions };

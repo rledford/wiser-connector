@@ -1,8 +1,8 @@
 ## wiser-connector
 
-Creates a connector to a Wiser REST API and reports tag position updates and zone transitions. The connector can be configured with custom zone definitions that will be sent to the Wiser instance for geofencing.
+Creates a connector to a Wiser REST API and reports tag position updates and zone transitions.
 
-Targets Node.js 6 or later.
+Targets ES6+.
 
 ## Table of Contents
 
@@ -15,38 +15,36 @@ Targets Node.js 6 or later.
 
 ## Install
 
-Currently, this is not a published NPM package. If it were, you would use the following to install the package.
-
 ```bash
 npm install wiser-connector
 ```
-
-So instead, clone this repository into your `node_modules` folder and `require` as usual.
 
 ## Usage
 
 ### Same Process
 
 ```js
-// import module
-const wc = require('wiser-connector');
+// import
+const { WiserConnector } = require('wiser-connector');
 
 // create connector
-const connector = wc.createConnector();
-
-// define options
-const options = { hostname: '127.0.0.1', port: 3101 };
+const connector = new WiserConnector();
 
 // start the connector
-connector.start(options);
+connector.start({
+  hostname: '127.0.0.1',
+  sampleRate: 500, // tag data will be checked every 0.5 seconds
+  tagHeartbeat: 1000, // tag updates are reported at most once per second
+  port: 3101
+});
 
 // listen for events
-connector.on('tagUpdate', data => {
+connector.on(WiserConnector.events.tagHeartbeat, data => {
   console.log(data);
 });
 
-// shutdown the connector
-connector.shutdown();
+// stop the connector
+connector.stop();
 ```
 
 ### Child Process
@@ -69,29 +67,27 @@ connector.send({
 connector.on('message', message => {
   const { event, data } = message;
   switch (event) {
-    case 'tagUpdate':
+    case 'tagHeartbeat': // same as WiserConnector.events.tagHeartbeat
       console.log(data);
       break;
   }
 });
 
-// shutdown the connector
+// stop the connector
 connector.send({
-  command: 'shutdown'
+  command: 'stop'
 });
 ```
 
 ## Options
 
-| Name                  | Type      | Default          | Description                                                                                                                                           |
-| --------------------- | --------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| id                    | `String`  | `WiserConnector` | The identifier to use for the connector.                                                                                                              |
-| hostname              | `String`  | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                                                                                                 |
-| port                  | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                                                                                                 |
-| reportTagUpdates      | `Boolean` | `true`           | Report when a tag updates.                                                                                                                            |
-| reportZoneTransitions | `Boolean` | `true`           | Report when tags enter or exit zones.                                                                                                                 |
-| updateInterval        | `Number`  | `500`            | The time, in milliseconds, that requests will be sent to the Wiser REST API. The requests are only made after the previous request has been processed |
-| zones                 | `Array`   | `[]`             | The custom zone definitions that will be sent to the Wiser instance to use for geofencing. See [Defining Zones](#defining-zones).                     |
+| Name          | Type     | Default          | Description                                                                   |
+| ------------- | -------- | ---------------- | ----------------------------------------------------------------------------- |
+| id            | `String` | `WiserConnector` | The identifier to use for the connector.                                      |
+| hostname      | `String` | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                         |
+| port          | `Number` | `3101`           | The TCP port to use to connect to the Wiser REST API.                         |
+| tagSampleRate | `Number` | `1000`           | How often the connector should sample tag data.                               |
+| tagHeartbeat  | `Number` | `60000`          | How often tag location changes are reported, independent of zone transitions. |
 
 ---
 
@@ -125,11 +121,15 @@ Example:
 
 ## Events
 
-### tagUpdate
+Register for events using the values defined in `WiserConnector.events` or use the event names directly.
 
-Emitted when a tag updates. See [Tag Property Definitions](#tag-property-definitions).
+### tagHeartbeat
 
-### zoneTransition
+Emitted when a tag updates and the time since the last heartbeat exceeds the configured `tagHeartbeat` value. See [Tag Property Definitions](#tag-property-definitions).
+
+TIP: Settings `tagHeartbeat` to `0` will cause every tag update to be reported.
+
+### tagZoneChanged
 
 Emitted when a tag enters or exits a zone. See data definition below.
 
@@ -166,46 +166,5 @@ Example
 Emitted after a connector's `status` method or command is executed. The data contains the current hardware status information returned from the Wiser REST API.
 
 ```js
-// Example coming soon
-```
-
-## Defining Zones
-
-When creating options for a connector to use, it's possible to provide an array of custom zone definitions that will be sent to the Wiser instance and used for geofencing. Only the zone `name` and `shape` are required, `color` is optional. Providing a zone `id` is uneccessary (and ignored).
-
-At this time, the Wiser REST API does not support DELETE requests for zones, so providing custom zones is not recommended since they cannot be fully managed by the connector. For example, if you define 5 custom zones, you will be able to edit them and restart the connector to update the Wiser instance, but if you remove one or more, they will still exist in the Wiser instance, so you will still see zone transitions for zones you've removed from the connector.
-
-IMPORTANT NOTE: The `id` for custom zones start at `1000`. If the Wiser instance is using a configuration file that has _more than 1000_ zones (highly unlikely), some of the zones in the Wiser instance will be overwritten by the custom zones.
-
-```js
-const wc = require('wiser-connector');
-const connector = wc.createConnector();
-
-// two adjacent zones that are 100x100 inches
-const zones = [
-  {
-    name: 'Custom Zone A',
-    shape: [
-      { x: 0, y: 0 },
-      { x: 100, y: 0 },
-      { x: 100, y: 100 },
-      { x: 0, y: 100 }
-    ]
-  },
-  {
-    name: 'Custom Zone B',
-    shape: [
-      { x: 100, y: 0 },
-      { x: 200, y: 0 },
-      { x: 200, y: 100 },
-      { x: 100, y: 100 }
-    ]
-  }
-];
-
-connector.start({
-  hostname: '127.0.0.1',
-  port: 3101,
-  zones: zones
-});
+// Example
 ```

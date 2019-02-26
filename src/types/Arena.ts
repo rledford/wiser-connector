@@ -1,0 +1,3 @@
+type Arena = {};
+
+export { Arena };
