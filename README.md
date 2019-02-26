@@ -1,6 +1,6 @@
 ## wiser-connector
 
-Creates a connector to a Wiser REST API and reports tag position updates and zone transitions.
+Creates a connector that samples data from a Wiser REST API and reports tag location updates and zone transitions.
 
 Targets ES6+.
 
@@ -81,44 +81,18 @@ connector.send({
 
 ## Options
 
-| Name          | Type      | Default          | Description                                                                   |
-| ------------- | --------- | ---------------- | ----------------------------------------------------------------------------- |
-| id            | `String`  | `WiserConnector` | The identifier to use for the connector.                                      |
-| hostname      | `String`  | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                         |
-| port          | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                         |
-| tlsEnabled    | `Boolean` | `false`          | If true, the connector will use https to connect to the Wiser REST API.       |
-| tagSampleRate | `Number`  | `1000`           | How often the connector should sample tag data.                               |
-| tagHeartbeat  | `Number`  | `60000`          | How often tag location changes are reported, independent of zone transitions. |
+| Name          | Type      | Default          | Description                                                                                  |
+| ------------- | --------- | ---------------- | -------------------------------------------------------------------------------------------- |
+| id            | `String`  | `WiserConnector` | The identifier to use for the connector.                                                     |
+| hostname      | `String`  | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                                        |
+| port          | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                                        |
+| tlsEnabled    | `Boolean` | `false`          | If true, the connector will use https to connect to the Wiser REST API.                      |
+| tagSampleRate | `Number`  | `1000`           | How often the connector should sample tag data (milliseconds).                               |
+| tagHeartbeat  | `Number`  | `60000`          | How often tag location changes are reported (milliseconds), independent of zone transitions. |
+
+The `tagHeartbeat` is meant to help limit how often events are generated for tag location updates. This is most helpful when you want to store tag location updates to a database but not as often as a tag updates since some may update multiple times a second. This also frees you from having to manage a separate dataset outside of the connector just to decide whether you should update your database or not. Zone transitions are ALWAYS reported no matter what the `tagHeartbeat` is set to.
 
 ---
-
-## Tag Property Definitions
-
-| Property  | Type       | Description                                                                    |
-| --------- | ---------- | ------------------------------------------------------------------------------ |
-| id        | `Number`   | The unique id of the tag report.                                               |
-| error     | `Number`   | The estimated error in location calculation.                                   |
-| location  | `Object`   | Location coordinates `{x: Number, y: Number, z: Number}`.                      |
-| tag       | `Number`   | An integer used to identify the tag. Usually printed on the tag in hex format. |
-| timestamp | `Number`   | Unix time in milliseconds.                                                     |
-| battery   | `Number`   | The current battery voltage of the tag. Anything below 2.8 is considered low.  |
-| zones     | `[Object]` | A list of zone IDs `{id: number}` that the tag is reported to be in.           |
-
-The location property is an object literal that defines the x, y, and z coordinates for the tag position.
-
-Example:
-
-```js
-{x: 10.2, y: 256.9, z: 34.0}
-```
-
-The `zones` property is an array that contains object literals which identify the zone that the tag is detected in. The `id` references the zone's index in the array of zones returned from the `/wiser/api/zone` endpoint.
-
-Example:
-
-```js
-[{ id: 0 }, { id: 1 }, { id: 2 }];
-```
 
 ## Events
 
@@ -126,7 +100,7 @@ Register for events using the values defined in `WiserConnector.events` or use t
 
 ### tagHeartbeat
 
-Emitted when a tag updates and the time since the last heartbeat exceeds the configured `tagHeartbeat` value. See [Tag Property Definitions](#tag-property-definitions).
+Emitted when a tag updates and the time since the last heartbeat exceeds the configured `tagHeartbeat` value. See [Tag Properties](#tag-properties).
 
 TIP: Setting `tagHeartbeat` to `0` will cause every tag update to be reported.
 
@@ -199,4 +173,34 @@ Emitted after a connector's `status` method or command is executed. The data con
     }
   ]
 }
+```
+
+---
+
+## Tag Properties
+
+| Property  | Type       | Description                                                                    |
+| --------- | ---------- | ------------------------------------------------------------------------------ |
+| id        | `Number`   | The unique id of the tag report.                                               |
+| error     | `Number`   | The estimated error in location calculation.                                   |
+| location  | `Object`   | Location coordinates `{x: Number, y: Number, z: Number}`.                      |
+| tag       | `Number`   | An integer used to identify the tag. Usually printed on the tag in hex format. |
+| timestamp | `Number`   | Unix time in milliseconds.                                                     |
+| battery   | `Number`   | The current battery voltage of the tag. Anything below 2.8 is considered low.  |
+| zones     | `[Object]` | A list of zone IDs `{id: number}` that the tag is reported to be in.           |
+
+The location property is an object literal that defines the x, y, and z coordinates for the tag position.
+
+Example:
+
+```js
+{x: 10.2, y: 256.9, z: 34.0}
+```
+
+The `zones` property is an array that contains object literals which identify the zone that the tag is detected in. The `id` references the zone's index in the array of zones returned from the `/wiser/api/zone` endpoint.
+
+Example:
+
+```js
+[{ id: 0 }, { id: 1 }, { id: 2 }];
 ```
