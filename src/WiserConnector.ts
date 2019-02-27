@@ -16,6 +16,11 @@ const requestErrorDelay = 5000;
 const maxRequestErrorDelayMultiplier = 5;
 let requestErrorDelayMultiplier = 0;
 
+enum zoneTransitionType {
+  EXIT = 0,
+  ENTER = 1
+}
+
 class WiserConnector extends EventEmitter {
   private id: string;
   private hostname: string;
@@ -152,7 +157,7 @@ class WiserConnector extends EventEmitter {
               if (this.trackerZones[id] && this.trackerZones[id].name) {
                 const { name } = this.trackerZones[id];
                 const transition: ZoneTransition = {
-                  type: 'enter',
+                  type: zoneTransitionType.ENTER,
                   tag: tag,
                   zone: { name, id }
                 };
@@ -167,7 +172,7 @@ class WiserConnector extends EventEmitter {
               if (this.trackerZones[id] && this.trackerZones[id].name) {
                 const { name } = this.trackerZones[id];
                 const transition: ZoneTransition = {
-                  type: 'exit',
+                  type: zoneTransitionType.EXIT,
                   tag: tag,
                   zone: { name, id }
                 };
