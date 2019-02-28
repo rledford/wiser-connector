@@ -8,10 +8,10 @@ Targets ES6+.
 
 - [Install](#install)
 - [Usage](#usage)
-- [Tag Property Definitions](#tag-property-definitions)
+- [Tag Properties](#tag-properties)
 - [Options](#options)
 - [Events](#events)
-- [Defining Zones](#defining-zones)
+- [Errors](#errors)
 
 ## Install
 
@@ -78,6 +78,38 @@ connector.send({
   command: 'stop'
 });
 ```
+
+---
+
+## Tag Properties
+
+| Property  | Type       | Description                                                                    |
+| --------- | ---------- | ------------------------------------------------------------------------------ |
+| id        | `Number`   | The unique id of the tag report.                                               |
+| error     | `Number`   | The estimated error in location calculation.                                   |
+| location  | `Object`   | Location coordinates `{x: Number, y: Number, z: Number}`.                      |
+| tag       | `Number`   | An integer used to identify the tag. Usually printed on the tag in hex format. |
+| timestamp | `Number`   | Unix time in milliseconds.                                                     |
+| battery   | `Number`   | The current battery voltage of the tag. Anything below 2.8 is considered low.  |
+| zones     | `[Object]` | A list of zone IDs `{id: number}` that the tag is reported to be in.           |
+
+The location property is an object literal that defines the x, y, and z coordinates for the tag position.
+
+Example:
+
+```js
+{x: 10.2, y: 256.9, z: 34.0}
+```
+
+The `zones` property is an array that contains object literals which identify the zone that the tag is detected in.
+
+Example:
+
+```js
+[{ id: 0 }, { id: 1 }, { id: 2 }];
+```
+
+---
 
 ## Options
 
@@ -177,30 +209,6 @@ Emitted after a connector's `status` method or command is executed. The data con
 
 ---
 
-## Tag Properties
+## Errors
 
-| Property  | Type       | Description                                                                    |
-| --------- | ---------- | ------------------------------------------------------------------------------ |
-| id        | `Number`   | The unique id of the tag report.                                               |
-| error     | `Number`   | The estimated error in location calculation.                                   |
-| location  | `Object`   | Location coordinates `{x: Number, y: Number, z: Number}`.                      |
-| tag       | `Number`   | An integer used to identify the tag. Usually printed on the tag in hex format. |
-| timestamp | `Number`   | Unix time in milliseconds.                                                     |
-| battery   | `Number`   | The current battery voltage of the tag. Anything below 2.8 is considered low.  |
-| zones     | `[Object]` | A list of zone IDs `{id: number}` that the tag is reported to be in.           |
-
-The location property is an object literal that defines the x, y, and z coordinates for the tag position.
-
-Example:
-
-```js
-{x: 10.2, y: 256.9, z: 34.0}
-```
-
-The `zones` property is an array that contains object literals which identify the zone that the tag is detected in.
-
-Example:
-
-```js
-[{ id: 0 }, { id: 1 }, { id: 2 }];
-```
+When a `WiserConnector` encounters an error while requesting data from a Wiser Tracker REST API, it will delay further requests by 10 seconds for each failed attempt. For example, when a request fails the first time, the connector waits 10 seconds and if it fails again it will wait 20 seconds, then 30, etc. The maximum delay is 120 seconds (2 minutes).

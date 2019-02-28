@@ -1,7 +1,7 @@
 import { Tag } from './Tag';
 
 type ZoneTransition = {
-  type: number;
+  type: string;
   tag: Tag;
   zone: { name: string; id: number };
 };

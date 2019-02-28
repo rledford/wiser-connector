@@ -12,13 +12,13 @@ const defaultOptions: ConnectorOptions = {
   tagSampleRate: 1000,
   tagHeartbeat: 60000
 };
-const requestErrorDelay = 5000;
-const maxRequestErrorDelayMultiplier = 5;
-let requestErrorDelayMultiplier = 0;
+const requestErrorDelay = 10000;
+const maxRequestErrorDelayMultiplier = 12;
+let requestErrorDelayMultiplier = 1;
 
 enum zoneTransitionType {
-  EXIT = 0,
-  ENTER = 1
+  EXIT = 'exit',
+  ENTER = 'enter'
 }
 
 class WiserConnector extends EventEmitter {
@@ -211,7 +211,7 @@ class WiserConnector extends EventEmitter {
       nextUpdateTimeout = requestErrorDelay * requestErrorDelayMultiplier;
       requestErrorDelayMultiplier = Math.min(
         maxRequestErrorDelayMultiplier,
-        ++requestErrorDelayMultiplier
+        requestErrorDelayMultiplier++
       );
     } else {
       requestErrorDelayMultiplier = 1;
