@@ -138,7 +138,7 @@ class WiserConnector extends EventEmitter {
       }
     }
 
-    if (tagReport) {
+    if (tagReport.length) {
       uniqueFilterTagReport(tagReport);
 
       tagReport.forEach(tag => {
@@ -209,9 +209,10 @@ class WiserConnector extends EventEmitter {
     let nextUpdateTimeout = this.tagSampleRate;
     if (delayNextUpdate) {
       nextUpdateTimeout = requestErrorDelay * requestErrorDelayMultiplier;
+      requestErrorDelayMultiplier += 1;
       requestErrorDelayMultiplier = Math.min(
         maxRequestErrorDelayMultiplier,
-        requestErrorDelayMultiplier++
+        requestErrorDelayMultiplier
       );
     } else {
       requestErrorDelayMultiplier = 1;
