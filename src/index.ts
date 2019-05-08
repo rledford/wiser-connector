@@ -1,1 +1,3 @@
-export { WiserConnector } from './WiserConnector';
+import WiserConnector from './WiserConnector';
+
+export = WiserConnector;

@@ -21,7 +21,7 @@ enum zoneTransitionType {
   ENTER = 'enter'
 }
 
-class WiserConnector extends EventEmitter {
+export default class WiserConnector extends EventEmitter {
   private id: string;
   private hostname: string;
   private port: number;
@@ -248,5 +248,3 @@ class WiserConnector extends EventEmitter {
 }
 
 const processInstance = isChildProcess ? new WiserConnector() : null;
-
-export { WiserConnector };
