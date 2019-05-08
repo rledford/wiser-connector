@@ -68,7 +68,7 @@ export default class WiserConnector extends EventEmitter {
             processInstance.shutdown();
             break;
           default:
-            console.log(`${this.id} :: unknown command ${command}`);
+            this.__emitEventMessage('error', `Unknown command ${command}`);
         }
       });
     }
