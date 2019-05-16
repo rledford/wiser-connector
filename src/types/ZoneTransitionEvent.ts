@@ -1,9 +1,8 @@
 import { Tag } from './Tag';
 
-type ZoneTransition = {
-  type: string;
+type ZoneTransitionEvent = {
   tag: Tag;
   zone: { name: string; id: number };
 };
 
-export { ZoneTransition };
+export { ZoneTransitionEvent };

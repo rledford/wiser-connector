@@ -1,5 +1,11 @@
 import { EventEmitter } from 'events';
-import { Arena, Tag, Zone, ZoneTransition, ConnectorOptions } from './types';
+import {
+  Arena,
+  Tag,
+  Zone,
+  ZoneTransitionEvent,
+  ConnectorOptions
+} from './types';
 import { getZoneTransitions, uniqueFilterTagReport } from './helpers';
 import {
   getArena,
@@ -188,7 +194,7 @@ export default class WiserConnector extends EventEmitter {
             transitions.exit.forEach(id => {
               if (this.trackerZones[id] && this.trackerZones[id].name) {
                 const { name } = this.trackerZones[id];
-                const transition: ZoneTransition = {
+                const transition: ZoneTransitionEvent = {
                   tag: tag,
                   zone: { name, id }
                 };
@@ -202,7 +208,7 @@ export default class WiserConnector extends EventEmitter {
             transitions.enter.forEach(id => {
               if (this.trackerZones[id] && this.trackerZones[id].name) {
                 const { name } = this.trackerZones[id];
-                const transition: ZoneTransition = {
+                const transition: ZoneTransitionEvent = {
                   tag: tag,
                   zone: { name, id }
                 };
