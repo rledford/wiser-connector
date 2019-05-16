@@ -1,7 +1,12 @@
 import { EventEmitter } from 'events';
 import { Arena, Tag, Zone, ZoneTransition, ConnectorOptions } from './types';
 import { getZoneTransitions, uniqueFilterTagReport } from './helpers';
-import { getArena, getZones, getPassiveTagReport } from './requests';
+import {
+  getArena,
+  getZones,
+  getPassiveTagReport,
+  isServerAvailable
+} from './requests';
 
 const isChildProcess = typeof process.send === 'function';
 const defaultOptions: ConnectorOptions = {
@@ -10,16 +15,9 @@ const defaultOptions: ConnectorOptions = {
   port: 3101,
   tlsEnabled: false,
   tagSampleRate: 1000,
-  tagHeartbeat: 60000
+  tagHeartbeat: 60000,
+  zoneSampleRate: 30000
 };
-const requestErrorDelay = 10000;
-const maxRequestErrorDelayMultiplier = 12;
-let requestErrorDelayMultiplier = 1;
-
-enum zoneTransitionType {
-  EXIT = 'exit',
-  ENTER = 'enter'
-}
 
 export default class WiserConnector extends EventEmitter {
   private id: string;
@@ -28,11 +26,15 @@ export default class WiserConnector extends EventEmitter {
   private tlsEnabled: boolean;
   private tagSampleRate: number;
   private tagHeartbeat: number;
-  private started: boolean;
-  private trackerTags: { [prop: string]: Tag };
-  private trackerZones: Zone[];
-  private tagHeartbeats: { [prop: string]: number };
-  private tagSampleTimeoutHandle: number;
+  private zoneSampleRate: number;
+  private started: boolean = false;
+  private trackerTags: { [prop: string]: Tag } = {};
+  private trackerZones: Zone[] = [];
+  private tagHeartbeats: { [prop: string]: number } = {};
+  private tagSampleTimeoutHandle: NodeJS.Timeout;
+  private zoneSampleTimeoutHandle: NodeJS.Timeout;
+  private checkConnectionIntervalHandle: NodeJS.Timeout;
+  private serverAvailable = true;
   private static processInstance: WiserConnector;
   public static events = {
     tagHeartbeat: 'tagHeartbeat',
@@ -50,18 +52,11 @@ export default class WiserConnector extends EventEmitter {
 
   constructor() {
     super();
-
-    this.id = 'WiserConnector';
-    this.hostname = '127.0.0.1';
-    this.port = 3101;
-    this.tlsEnabled = false;
-    this.tagSampleRate = 1000;
-    this.tagHeartbeat = 60000;
-    this.started = false;
-    this.trackerTags = {};
-    this.trackerZones = [];
-    this.tagHeartbeats = {};
-    this.tagSampleTimeoutHandle = -1;
+    Object.assign(this, defaultOptions);
+    this.checkConnectionIntervalHandle = setInterval(
+      this.__checkConnection.bind(this),
+      1000
+    );
 
     if (isChildProcess) {
       const connector = WiserConnector.getProcessInstance();
@@ -113,19 +108,29 @@ export default class WiserConnector extends EventEmitter {
     }
   }
 
-  private async __update() {
-    if (!this.started) return;
+  private async __checkConnection() {
+    if (!this.serverAvailable && (await isServerAvailable(this))) {
+      clearTimeout(this.zoneSampleTimeoutHandle);
+      clearTimeout(this.tagSampleTimeoutHandle);
+      this.serverAvailable = true;
+      this.zoneSampleTimeoutHandle = setTimeout(
+        this.__sampleZones.bind(this),
+        0
+      );
+      this.tagSampleTimeoutHandle = setTimeout(this.__sampleTags.bind(this), 0);
+    }
+  }
 
-    let tagReport: Tag[] = [];
+  private async __sampleZones() {
+    if (!this.started || !this.serverAvailable) return;
     let zones: Zone[] = [];
-    let delayNextUpdate = false;
 
     try {
-      tagReport = await getPassiveTagReport(this);
       zones = await getZones(this);
     } catch (err) {
       this.__emitEventMessage('error', err);
-      delayNextUpdate = true;
+      this.serverAvailable = false;
+      return;
     }
 
     if (zones.length) {
@@ -147,6 +152,24 @@ export default class WiserConnector extends EventEmitter {
       }
     }
 
+    this.zoneSampleTimeoutHandle = setTimeout(
+      this.__sampleZones.bind(this),
+      this.zoneSampleRate
+    );
+  }
+
+  private async __sampleTags() {
+    if (!this.started || !this.serverAvailable) return;
+    let tagReport: Tag[] = [];
+
+    try {
+      tagReport = await getPassiveTagReport(this);
+    } catch (err) {
+      this.__emitEventMessage('error', err);
+      this.serverAvailable = false;
+      return;
+    }
+
     if (tagReport.length) {
       uniqueFilterTagReport(tagReport);
 
@@ -162,31 +185,29 @@ export default class WiserConnector extends EventEmitter {
               nextZoneIdList
             );
 
-            transitions.enter.forEach(id => {
+            transitions.exit.forEach(id => {
               if (this.trackerZones[id] && this.trackerZones[id].name) {
                 const { name } = this.trackerZones[id];
                 const transition: ZoneTransition = {
-                  type: zoneTransitionType.ENTER,
                   tag: tag,
                   zone: { name, id }
                 };
                 this.__emitEventMessage(
-                  WiserConnector.events.tagZoneChanged,
+                  WiserConnector.events.tagExitedZone,
                   transition
                 );
               }
             });
 
-            transitions.exit.forEach(id => {
+            transitions.enter.forEach(id => {
               if (this.trackerZones[id] && this.trackerZones[id].name) {
                 const { name } = this.trackerZones[id];
                 const transition: ZoneTransition = {
-                  type: zoneTransitionType.EXIT,
                   tag: tag,
                   zone: { name, id }
                 };
                 this.__emitEventMessage(
-                  WiserConnector.events.tagZoneChanged,
+                  WiserConnector.events.tagEnteredZone,
                   transition
                 );
               }
@@ -215,19 +236,10 @@ export default class WiserConnector extends EventEmitter {
       });
     }
 
-    let nextUpdateTimeout = this.tagSampleRate;
-    if (delayNextUpdate) {
-      nextUpdateTimeout = requestErrorDelay * requestErrorDelayMultiplier;
-      requestErrorDelayMultiplier += 1;
-      requestErrorDelayMultiplier = Math.min(
-        maxRequestErrorDelayMultiplier,
-        requestErrorDelayMultiplier
-      );
-    } else {
-      requestErrorDelayMultiplier = 1;
-    }
-
-    setTimeout(this.__update.bind(this), nextUpdateTimeout);
+    this.tagSampleTimeoutHandle = setTimeout(
+      this.__sampleTags.bind(this),
+      this.tagSampleRate
+    );
   }
 
   async status() {
@@ -247,11 +259,24 @@ export default class WiserConnector extends EventEmitter {
 
     this.started = true;
 
-    setTimeout(this.__update.bind(this), this.tagSampleRate);
+    this.zoneSampleTimeoutHandle = setTimeout(
+      this.__sampleZones.bind(this),
+      500
+    );
+    this.tagSampleTimeoutHandle = setTimeout(
+      this.__sampleTags.bind(this),
+      1000
+    );
+    this.checkConnectionIntervalHandle = setTimeout(
+      this.__checkConnection.bind(this),
+      0
+    );
   }
 
   shutdown() {
     this.started = false;
+    clearInterval(this.checkConnectionIntervalHandle);
+    clearTimeout(this.zoneSampleTimeoutHandle);
     clearTimeout(this.tagSampleTimeoutHandle);
   }
 }
