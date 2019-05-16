@@ -5,6 +5,7 @@ type ConnectorOptions = {
   tlsEnabled?: boolean;
   tagSampleRate?: number;
   tagHeartbeat?: number;
+  zoneSampleRate?: number;
 };
 
 export { ConnectorOptions };
