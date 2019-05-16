@@ -113,25 +113,23 @@ function isServerAvailable(connector: WiserConnector): Promise<boolean> {
       res.on('end', () => {
         if (res.statusCode) {
           if (res.statusCode < 200 || res.statusCode >= 300) {
-            return reject(
-              `GET error - server responded with status code ${res.statusCode}`
-            );
+            return resolve(false);
           }
         }
 
         resolve(true);
       });
       res.on('error', (err: any) => {
-        reject(err);
+        resolve(false);
       });
     });
 
     req.setTimeout(DEFAULT_TIMEOUT, () => {
-      reject('request timeout');
+      resolve(false);
     });
 
     req.on('error', (err: any) => {
-      reject(err);
+      resolve(false);
     });
 
     req.end();
