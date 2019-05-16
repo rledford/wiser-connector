@@ -36,7 +36,8 @@ export default class WiserConnector extends EventEmitter {
   private static processInstance: WiserConnector;
   public static events = {
     tagHeartbeat: 'tagHeartbeat',
-    tagZoneChanged: 'tagZoneChanged',
+    tagEnteredZone: 'tagEnteredZone',
+    tagExitedZone: 'tagExitedZone',
     status: 'status',
     error: 'error'
   };
