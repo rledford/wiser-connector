@@ -33,12 +33,19 @@ export default class WiserConnector extends EventEmitter {
   private trackerZones: Zone[];
   private tagHeartbeats: { [prop: string]: number };
   private tagSampleTimeoutHandle: number;
+  private static processInstance: WiserConnector;
   public static events = {
     tagHeartbeat: 'tagHeartbeat',
     tagZoneChanged: 'tagZoneChanged',
     status: 'status',
     error: 'error'
   };
+  private static getProcessInstance(): WiserConnector {
+    if (!WiserConnector.processInstance) {
+      WiserConnector.processInstance = new WiserConnector();
+    }
+    return WiserConnector.processInstance;
+  }
 
   constructor() {
     super();
@@ -55,17 +62,18 @@ export default class WiserConnector extends EventEmitter {
     this.tagHeartbeats = {};
     this.tagSampleTimeoutHandle = -1;
 
-    if (isChildProcess && processInstance !== null) {
+    if (isChildProcess) {
+      const connector = WiserConnector.getProcessInstance();
       this.on('message', message => {
         const { command, options } = message;
         switch (command) {
           case 'start':
-            processInstance.start(options);
+            connector.start(options);
             break;
           case 'status':
-            processInstance.status();
+            connector.status();
           case 'shutdown':
-            processInstance.shutdown();
+            connector.shutdown();
             break;
           default:
             this.__emitEventMessage('error', `Unknown command [ ${command} ]`);
@@ -246,5 +254,3 @@ export default class WiserConnector extends EventEmitter {
     clearTimeout(this.tagSampleTimeoutHandle);
   }
 }
-
-const processInstance = isChildProcess ? new WiserConnector() : null;
