@@ -15,11 +15,14 @@ const {
 connector.on('error', err => {
   console.log(err);
 });
-connector.on('tagZoneChanged', tag => {
-  console.log('tag zone changed', tag);
+connector.on('tagExitedZone', data => {
+  console.log('tag exited zone', data);
 });
-connector.on('tagHeartbeat', transition => {
-  console.log('tag heartbeat', transition);
+connector.on('tagEnteredZone', data => {
+  console.log('tag entered zone', data);
+});
+connector.on('tagHeartbeat', tag => {
+  console.log('tag heartbeat', tag);
 });
 
 connector.start({
