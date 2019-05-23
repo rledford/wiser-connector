@@ -136,13 +136,12 @@ Emitted when a tag updates and the time since the last heartbeat exceeds the con
 
 TIP: Setting `tagHeartbeat` to `0` will cause every tag update to be reported.
 
-### tagZoneChanged
+### tagEnteredZone & tagExitedZone
 
-Emitted when a tag enters or exits a zone. See data definition below.
+Emitted when a tag enters or exits a zone. See event data object definition below.
 
 | Property | Type     | Description                                                              |
 | -------- | -------- | ------------------------------------------------------------------------ |
-| `type`   | `String` | Will be either `'enter'` or `'exit'`                                     |
 | `tag`    | `Object` | The raw tag report data for the tag that transitioned zones.             |
 | `zone`   | `Object` | Contains the Wiser id and name of the zone where the transition occured. |
 
@@ -150,7 +149,6 @@ Example
 
 ```js
 {
-  type: 'enter',
   tag: {
     id: 0,
     tag: 31000,
