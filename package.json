@@ -1,6 +1,6 @@
 {
   "name": "wiser-connector",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "description": "Samples data from a Wiser Tracker REST API and reports tag location updates and zone transitions.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -35,8 +35,8 @@
   "homepage": "https://github.com/rledford/wiser-connector#readme",
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "^11.9.5",
-    "tslint": "^5.13.0",
-    "typescript": "^3.3.3333"
+    "@types/node": "^11.13.11",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
   }
 }
