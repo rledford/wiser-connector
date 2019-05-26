@@ -8,15 +8,15 @@ Targets ES6+.
 
 - [Install](#install)
 - [Usage](#usage)
-- [Tag Properties](#tag-properties)
 - [Options](#options)
+- [Tag Properties](#tag-properties)
 - [Events](#events)
 - [Errors](#errors)
 
 ## Install
 
 ```bash
-npm install wiser-connector
+npm i -S wiser-connector
 ```
 
 ## Usage
@@ -82,6 +82,22 @@ connector.send({
 
 ---
 
+## Options
+
+| Name          | Type      | Default          | Description                                                                                  |
+| ------------- | --------- | ---------------- | -------------------------------------------------------------------------------------------- |
+| id            | `String`  | `WiserConnector` | The identifier to use for the connector.                                                     |
+| hostname      | `String`  | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                                        |
+| port          | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                                        |
+| tlsEnabled    | `Boolean` | `false`          | If true, the connector will use https to connect to the Wiser REST API.                      |
+| tagSampleRate | `Number`  | `1000`           | How often the connector should sample tag data (milliseconds).                               |
+| zoneSampleRate | `Number` | `30000` | How often the connector should sample zone data (milliseconds). |
+| tagHeartbeat  | `Number`  | `60000`          | How often tag location changes are reported (milliseconds), independent of zone transitions. |
+
+_NOTE_: Zone transitions are ALWAYS reported no matter what the `tagHeartbeat` is set to.
+
+---
+
 ## Tag Properties
 
 | Property  | Type       | Description                                                                    |
@@ -102,29 +118,13 @@ Example:
 {x: 10.2, y: 256.9, z: 34.0}
 ```
 
-The `zones` property is an array that contains object literals which identify the zone that the tag is detected in.
+The `zones` property is an array of objects which describes which zones the tag is currently in.
 
 Example:
 
 ```js
 [{ id: 0 }, { id: 1 }, { id: 2 }];
 ```
-
----
-
-## Options
-
-| Name          | Type      | Default          | Description                                                                                  |
-| ------------- | --------- | ---------------- | -------------------------------------------------------------------------------------------- |
-| id            | `String`  | `WiserConnector` | The identifier to use for the connector.                                                     |
-| hostname      | `String`  | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                                        |
-| port          | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                                        |
-| tlsEnabled    | `Boolean` | `false`          | If true, the connector will use https to connect to the Wiser REST API.                      |
-| tagSampleRate | `Number`  | `1000`           | How often the connector should sample tag data (milliseconds).                               |
-| zoneSampleRate | `Number` | `30000` | How often the connector should sample zone data (milliseconds). |
-| tagHeartbeat  | `Number`  | `60000`          | How often tag location changes are reported (milliseconds), independent of zone transitions. |
-
-_NOTE_: Zone transitions are ALWAYS reported no matter what the `tagHeartbeat` is set to.
 
 ---
 
