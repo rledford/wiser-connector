@@ -1,17 +1,17 @@
 import { Tag } from './types';
 
-function uniqueFilterTagReport(tagReport: Tag[]) {
-  tagReport.sort((a, b) => {
-    return a.timestamp <= b.timestamp ? -1 : 1;
-  });
+function uniqueFilterTagReport(tagReport: Tag[]): Tag[] {
+  const result = [];
   let unique: { [prop: string]: boolean } = {};
-  for (let i = tagReport.length - 1; i > -1; i--) {
-    if (unique[tagReport[i].tag]) {
-      tagReport.splice(i, 1);
-    } else {
-      unique[tagReport[i].tag] = true;
-    }
-  }
+  tagReport.sort((a, b) => {
+    return a.timestamp >= b.timestamp ? -1 : 1;
+  });
+  tagReport.forEach(tag => {
+    if (unique[tag.tag]) return;
+    result.push(tag);
+    unique[tag.tag] = true;
+  });
+  return result;
 }
 
 function getZoneTransitions(

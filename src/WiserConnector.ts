@@ -181,7 +181,7 @@ export default class WiserConnector extends EventEmitter {
     }
 
     if (tagReport.length) {
-      uniqueFilterTagReport(tagReport);
+      tagReport = uniqueFilterTagReport(tagReport);
 
       tagReport.forEach(tag => {
         const current: Tag = this.trackerTags[tag.tag];
