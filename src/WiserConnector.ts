@@ -39,8 +39,7 @@ export default class WiserConnector extends EventEmitter {
   private tagHeartbeats: { [prop: string]: number } = {};
   private tagSampleTimeoutHandle: NodeJS.Timeout;
   private zoneSampleTimeoutHandle: NodeJS.Timeout;
-  private checkConnectionIntervalHandle: NodeJS.Timeout;
-  private serverAvailable = true;
+  private connectionReady = false;
   private static processInstance: WiserConnector;
   public static events = {
     tagHeartbeat: 'tagHeartbeat',
@@ -59,7 +58,7 @@ export default class WiserConnector extends EventEmitter {
   constructor() {
     super();
     Object.assign(this, defaultOptions);
-    this.checkConnectionIntervalHandle = setInterval(
+    setTimeout(
       this.__checkConnection.bind(this),
       1000
     );
@@ -115,27 +114,32 @@ export default class WiserConnector extends EventEmitter {
   }
 
   private async __checkConnection() {
-    if (!this.serverAvailable && (await isServerAvailable(this))) {
+    if (!this.connectionReady && (await isServerAvailable(this))) {
       clearTimeout(this.zoneSampleTimeoutHandle);
       clearTimeout(this.tagSampleTimeoutHandle);
-      this.serverAvailable = true;
+      this.connectionReady = true;
       this.zoneSampleTimeoutHandle = setTimeout(
         this.__sampleZones.bind(this),
-        0
+        1
       );
-      this.tagSampleTimeoutHandle = setTimeout(this.__sampleTags.bind(this), 0);
+      this.tagSampleTimeoutHandle = setTimeout(this.__sampleTags.bind(this), 1);
     }
+
+    setTimeout(
+      this.__checkConnection.bind(this),
+      1000
+    );
   }
 
   private async __sampleZones() {
-    if (!this.started || !this.serverAvailable) return;
+    if (!this.started || !this.connectionReady) return;
     let zones: Zone[] = [];
 
     try {
       zones = await getZones(this);
     } catch (err) {
       this.__emitEventMessage('error', err);
-      this.serverAvailable = false;
+      this.connectionReady = false;
       return;
     }
 
@@ -165,14 +169,14 @@ export default class WiserConnector extends EventEmitter {
   }
 
   private async __sampleTags() {
-    if (!this.started || !this.serverAvailable) return;
+    if (!this.started || !this.connectionReady) return;
     let tagReport: Tag[] = [];
 
     try {
       tagReport = await getPassiveTagReport(this);
     } catch (err) {
       this.__emitEventMessage('error', err);
-      this.serverAvailable = false;
+      this.connectionReady = false;
       return;
     }
 
@@ -248,6 +252,12 @@ export default class WiserConnector extends EventEmitter {
     );
   }
 
+  private __cleanup() {
+    clearTimeout(this.zoneSampleTimeoutHandle);
+    clearTimeout(this.tagSampleTimeoutHandle);
+    this.connectionReady = false;
+  }
+
   async status() {
     try {
       const status: Arena = await getArena(this);
@@ -262,27 +272,12 @@ export default class WiserConnector extends EventEmitter {
     if (this.started) {
       return;
     }
-
+    this.__cleanup();
     this.started = true;
-
-    this.zoneSampleTimeoutHandle = setTimeout(
-      this.__sampleZones.bind(this),
-      500
-    );
-    this.tagSampleTimeoutHandle = setTimeout(
-      this.__sampleTags.bind(this),
-      1000
-    );
-    this.checkConnectionIntervalHandle = setTimeout(
-      this.__checkConnection.bind(this),
-      0
-    );
   }
 
   shutdown() {
+    this.__cleanup();
     this.started = false;
-    clearInterval(this.checkConnectionIntervalHandle);
-    clearTimeout(this.zoneSampleTimeoutHandle);
-    clearTimeout(this.tagSampleTimeoutHandle);
   }
 }
