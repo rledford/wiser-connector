@@ -34,6 +34,7 @@ const connector = new WiserConnector();
 connector.start({
   hostname: '127.0.0.1',
   tagSampleRate: 500, // tag data will be checked every 0.5 seconds
+  zoneSampleRate: 30000, // zone data will be checked every 30 seconds
   tagHeartbeat: 1000, // tag updates are reported at most once per second
   port: 3101
 });
@@ -43,8 +44,8 @@ connector.on(WiserConnector.events.tagHeartbeat, message => {
   console.log(message);
 });
 
-// stop the connector
-connector.stop();
+// shutdown the connector
+connector.shutdown();
 ```
 
 ### Child Process
@@ -73,9 +74,9 @@ connector.on('message', message => {
   }
 });
 
-// stop the connector
+// shutdown the connector
 connector.send({
-  command: 'stop'
+  command: 'shutdown'
 });
 ```
 
@@ -93,7 +94,7 @@ connector.send({
 | battery   | `Number`   | The current battery voltage of the tag. Anything below 2.8 is considered low.  |
 | zones     | `[Object]` | A list of zone IDs `{id: number}` that the tag is reported to be in.           |
 
-The location property is an object literal that defines the x, y, and z coordinates for the tag position.
+The location property is an object that contains the x, y, and z coordinates for the tag position.
 
 Example:
 
@@ -120,9 +121,10 @@ Example:
 | port          | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                                        |
 | tlsEnabled    | `Boolean` | `false`          | If true, the connector will use https to connect to the Wiser REST API.                      |
 | tagSampleRate | `Number`  | `1000`           | How often the connector should sample tag data (milliseconds).                               |
+| zoneSampleRate | `Number` | `30000` | How often the connector should sample zone data (milliseconds). |
 | tagHeartbeat  | `Number`  | `60000`          | How often tag location changes are reported (milliseconds), independent of zone transitions. |
 
-The `tagHeartbeat` is meant to help limit how often events are generated for tag location updates. This is most helpful when you want to store tag location updates to a database but not as often as a tag updates since some may update multiple times a second. This also frees you from having to manage a separate dataset outside of the connector just to decide whether you should update your database or not. Zone transitions are ALWAYS reported no matter what the `tagHeartbeat` is set to.
+_NOTE_: Zone transitions are ALWAYS reported no matter what the `tagHeartbeat` is set to.
 
 ---
 
@@ -206,7 +208,3 @@ Emitted after a connector's `status` method or command is executed. The data con
 ```
 
 ---
-
-## Errors
-
-When a `WiserConnector` encounters an error while requesting data from a Wiser Tracker REST API, it will delay further requests by 10 seconds for each failed attempt. For example, when a request fails the first time, the connector waits 10 seconds and if it fails again it will wait 20 seconds, then 30, etc. The maximum delay is 120 seconds (2 minutes).
