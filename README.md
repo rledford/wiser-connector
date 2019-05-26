@@ -8,7 +8,7 @@ Targets ES6+.
 
 - [Install](#install)
 - [Usage](#usage)
-- [Options](#options)
+- [Connector Options](#connector-options)
 - [Tag Properties](#tag-properties)
 - [Events](#events)
 - [Errors](#errors)
@@ -82,7 +82,7 @@ connector.send({
 
 ---
 
-## Options
+## Connector Options
 
 | Name          | Type      | Default          | Description                                                                                  |
 | ------------- | --------- | ---------------- | -------------------------------------------------------------------------------------------- |
