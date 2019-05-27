@@ -36,3 +36,10 @@ connector.on('tagHeartbeat', tag => {
 });
 
 connector.start(options);
+
+setTimeout(() => {
+  connector.shutdown();
+  setTimeout(() => {
+    connector.start(options);
+  }, 1000)
+}, 10000);
