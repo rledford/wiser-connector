@@ -34,11 +34,13 @@ export default class WiserConnector extends EventEmitter {
   private tagHeartbeat: number;
   private zoneSampleRate: number;
   private started: boolean = false;
+  private checkConnectionLock: boolean = false;
   private trackerTags: { [prop: string]: Tag } = {};
   private trackerZones: Zone[] = [];
   private tagHeartbeats: { [prop: string]: number } = {};
   private tagSampleTimeoutHandle: NodeJS.Timeout;
   private zoneSampleTimeoutHandle: NodeJS.Timeout;
+  private checkConnectionIntervalHandle: NodeJS.Timeout;
   private connectionReady = false;
   private static processInstance: WiserConnector;
   public static events = {
@@ -48,7 +50,7 @@ export default class WiserConnector extends EventEmitter {
     status: 'status',
     error: 'error'
   };
-  private static getProcessInstance(): WiserConnector {
+  public static getProcessInstance(): WiserConnector {
     if (!WiserConnector.processInstance) {
       WiserConnector.processInstance = new WiserConnector();
     }
@@ -58,30 +60,7 @@ export default class WiserConnector extends EventEmitter {
   constructor() {
     super();
     Object.assign(this, defaultOptions);
-    setTimeout(
-      this.checkConnection.bind(this),
-      1000
-    );
-
-    if (isChildProcess) {
-      const connector = WiserConnector.getProcessInstance();
-      this.on('message', message => {
-        const { command, options } = message;
-        switch (command) {
-          case 'start':
-            connector.start(options);
-            break;
-          case 'status':
-            connector.status();
-          case 'shutdown':
-            connector.shutdown();
-            break;
-          default:
-            this.emitEventMessage('error', `Unknown command [ ${command} ]`);
         }
-      });
-    }
-  }
 
   getId(): string {
     return this.id;
@@ -114,6 +93,8 @@ export default class WiserConnector extends EventEmitter {
   }
 
   private async checkConnection() {
+    if (this.checkConnectionLock) return;
+    this.checkConnectionLock = true;
     if (!this.connectionReady && (await isServerAvailable(this))) {
       clearTimeout(this.zoneSampleTimeoutHandle);
       clearTimeout(this.tagSampleTimeoutHandle);
@@ -124,11 +105,7 @@ export default class WiserConnector extends EventEmitter {
       );
       this.tagSampleTimeoutHandle = setTimeout(this.sampleTags.bind(this), 1);
     }
-
-    setTimeout(
-      this.checkConnection.bind(this),
-      1000
-    );
+    this.checkConnectionLock = false;
   }
 
   private async sampleZones() {
@@ -253,6 +230,7 @@ export default class WiserConnector extends EventEmitter {
   }
 
   private cleanup() {
+    clearInterval(this.checkConnectionIntervalHandle);
     clearTimeout(this.zoneSampleTimeoutHandle);
     clearTimeout(this.tagSampleTimeoutHandle);
     this.connectionReady = false;
@@ -274,6 +252,7 @@ export default class WiserConnector extends EventEmitter {
     }
     this.cleanup();
     this.started = true;
+    this.checkConnectionIntervalHandle = setInterval(this.checkConnection.bind(this), 1000);
   }
 
   shutdown() {
