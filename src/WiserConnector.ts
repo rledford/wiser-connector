@@ -50,34 +50,39 @@ export default class WiserConnector extends EventEmitter {
     status: 'status',
     error: 'error'
   };
+  
   public static getProcessInstance(): WiserConnector {
     if (!WiserConnector.processInstance) {
       WiserConnector.processInstance = new WiserConnector();
     }
     return WiserConnector.processInstance;
   }
-
+  
   constructor() {
     super();
     Object.assign(this, defaultOptions);
   }
-
+  
   getId(): string {
     return this.id;
   }
+  
   getHostname(): string {
     return this.hostname;
   }
+  
   getPort(): number {
     return this.port;
   }
+  
   isTLSEnabled(): boolean {
     return this.tlsEnabled;
   }
+  
   isStarted() {
     return this.started;
   }
-
+  
   private emitEventMessage(event: string, message: any) {
     if (event === 'error ' && this.listenerCount('error') === 0) {
       return;
@@ -229,13 +234,6 @@ export default class WiserConnector extends EventEmitter {
     );
   }
 
-  private cleanup() {
-    clearInterval(this.checkConnectionIntervalHandle);
-    clearTimeout(this.zoneSampleTimeoutHandle);
-    clearTimeout(this.tagSampleTimeoutHandle);
-    this.connectionReady = false;
-  }
-
   async status() {
     try {
       const status: Arena = await getArena(this);
@@ -250,13 +248,16 @@ export default class WiserConnector extends EventEmitter {
     if (this.started) {
       return;
     }
-    this.cleanup();
+    this.connectionReady = false;
     this.started = true;
     this.checkConnectionIntervalHandle = setInterval(this.checkConnection.bind(this), 1000);
   }
 
   shutdown() {
-    this.cleanup();
+    clearInterval(this.checkConnectionIntervalHandle);
+    clearTimeout(this.zoneSampleTimeoutHandle);
+    clearTimeout(this.tagSampleTimeoutHandle);
+    this.connectionReady = false;
     this.started = false;
   }
 }
@@ -264,7 +265,6 @@ export default class WiserConnector extends EventEmitter {
 if (isChildProcess) {
   const connector = WiserConnector.getProcessInstance();
   process.on('message', message => {
-    console.log('CHILD received message', message);
     const { command, options } = message;
     switch (command) {
       case 'start':
