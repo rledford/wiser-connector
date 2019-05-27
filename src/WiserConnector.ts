@@ -60,7 +60,7 @@ export default class WiserConnector extends EventEmitter {
   constructor() {
     super();
     Object.assign(this, defaultOptions);
-        }
+  }
 
   getId(): string {
     return this.id;
@@ -259,4 +259,24 @@ export default class WiserConnector extends EventEmitter {
     this.cleanup();
     this.started = false;
   }
+}
+
+if (isChildProcess) {
+  const connector = WiserConnector.getProcessInstance();
+  process.on('message', message => {
+    console.log('CHILD received message', message);
+    const { command, options } = message;
+    switch (command) {
+      case 'start':
+        connector.start(options);
+        break;
+      case 'status':
+        connector.status();
+      case 'shutdown':
+        connector.shutdown();
+        break;
+      default:
+        this.emitEventMessage('error', `Unknown command [ ${command} ]`);
+    }
+  });
 }
