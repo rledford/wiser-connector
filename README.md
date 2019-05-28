@@ -84,15 +84,15 @@ connector.send({
 
 ## Connector Options
 
-| Name          | Type      | Default          | Description                                                                                  |
-| ------------- | --------- | ---------------- | -------------------------------------------------------------------------------------------- |
-| id            | `String`  | `WiserConnector` | The identifier to use for the connector.                                                     |
-| hostname      | `String`  | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                                        |
-| port          | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                                        |
-| tlsEnabled    | `Boolean` | `false`          | If true, the connector will use https to connect to the Wiser REST API.                      |
-| tagSampleRate | `Number`  | `1000`           | How often the connector should sample tag data (milliseconds).                               |
-| zoneSampleRate | `Number` | `30000` | How often the connector should sample zone data (milliseconds). |
-| tagHeartbeat  | `Number`  | `60000`          | How often tag location changes are reported (milliseconds), independent of zone transitions. |
+| Name           | Type      | Default          | Description                                                                                  |
+| -------------- | --------- | ---------------- | -------------------------------------------------------------------------------------------- |
+| id             | `String`  | `WiserConnector` | The identifier to use for the connector.                                                     |
+| hostname       | `String`  | `127.0.0.1`      | The hostname to use to connect to the Wiser REST API.                                        |
+| port           | `Number`  | `3101`           | The TCP port to use to connect to the Wiser REST API.                                        |
+| tlsEnabled     | `Boolean` | `false`          | If true, the connector will use https to connect to the Wiser REST API.                      |
+| tagSampleRate  | `Number`  | `1000`           | How often the connector should sample tag data (milliseconds).                               |
+| zoneSampleRate | `Number`  | `30000`          | How often the connector should sample zone data (milliseconds).                              |
+| tagHeartbeat   | `Number`  | `60000`          | How often tag location changes are reported (milliseconds), independent of zone transitions. |
 
 _NOTE_: Zone transitions are ALWAYS reported no matter what the `tagHeartbeat` is set to.
 
@@ -134,9 +134,9 @@ Register for events using the values defined in `WiserConnector.events` or use t
 
 ### tagHeartbeat
 
-Emitted when a tag updates and the time since the last heartbeat exceeds the configured `tagHeartbeat` value. See [Tag Properties](#tag-properties).
+Emitted when a tag updates and the time since the last heartbeat is greater than or equal to the configured `tagHeartbeat` value. See [Tag Properties](#tag-properties).
 
-TIP: Setting `tagHeartbeat` to `0` will cause every tag update to be reported.
+_TIP_: Setting `tagHeartbeat` to `0` will cause every tag update to be reported.
 
 ### tagEnteredZone & tagExitedZone
 
