@@ -38,8 +38,8 @@ export default class WiserConnector extends EventEmitter {
   private trackerTags: { [prop: string]: Tag } = {};
   private trackerZones: Zone[] = [];
   private tagHeartbeats: { [prop: string]: number } = {};
-  private tagSampleTimeoutHandle: NodeJS.Timeout;
-  private zoneSampleTimeoutHandle: NodeJS.Timeout;
+  private tagSampleTimeoutHandle: any = -1;
+  private zoneSampleTimeoutHandle: any = -1;
   private checkConnectionIntervalHandle: NodeJS.Timeout;
   private connectionReady = false;
   private static processInstance: WiserConnector;
@@ -50,39 +50,39 @@ export default class WiserConnector extends EventEmitter {
     status: 'status',
     error: 'error'
   };
-  
+
   public static getProcessInstance(): WiserConnector {
     if (!WiserConnector.processInstance) {
       WiserConnector.processInstance = new WiserConnector();
     }
     return WiserConnector.processInstance;
   }
-  
+
   constructor() {
     super();
     Object.assign(this, defaultOptions);
   }
-  
+
   getId(): string {
     return this.id;
   }
-  
+
   getHostname(): string {
     return this.hostname;
   }
-  
+
   getPort(): number {
     return this.port;
   }
-  
+
   isTLSEnabled(): boolean {
     return this.tlsEnabled;
   }
-  
+
   isStarted() {
     return this.started;
   }
-  
+
   private emitEventMessage(event: string, message: any) {
     if (event === 'error ' && this.listenerCount('error') === 0) {
       return;
@@ -104,10 +104,7 @@ export default class WiserConnector extends EventEmitter {
       clearTimeout(this.zoneSampleTimeoutHandle);
       clearTimeout(this.tagSampleTimeoutHandle);
       this.connectionReady = true;
-      this.zoneSampleTimeoutHandle = setTimeout(
-        this.sampleZones.bind(this),
-        1
-      );
+      this.zoneSampleTimeoutHandle = setTimeout(this.sampleZones.bind(this), 1);
       this.tagSampleTimeoutHandle = setTimeout(this.sampleTags.bind(this), 1);
     }
     this.checkConnectionLock = false;
@@ -213,10 +210,7 @@ export default class WiserConnector extends EventEmitter {
                 this.tagHeartbeat
               ) {
                 this.tagHeartbeats[tag.tag] = tag.timestamp;
-                this.emitEventMessage(
-                  WiserConnector.events.tagHeartbeat,
-                  tag
-                );
+                this.emitEventMessage(WiserConnector.events.tagHeartbeat, tag);
               }
             } else {
               this.tagHeartbeats[tag.tag] = tag.timestamp;
@@ -250,7 +244,10 @@ export default class WiserConnector extends EventEmitter {
     }
     this.connectionReady = false;
     this.started = true;
-    this.checkConnectionIntervalHandle = setInterval(this.checkConnection.bind(this), 1000);
+    this.checkConnectionIntervalHandle = setInterval(
+      this.checkConnection.bind(this),
+      1000
+    );
   }
 
   shutdown() {
