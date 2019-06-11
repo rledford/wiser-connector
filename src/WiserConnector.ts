@@ -38,9 +38,9 @@ export default class WiserConnector extends EventEmitter {
   private trackerTags: { [prop: string]: Tag } = {};
   private trackerZones: Zone[] = [];
   private tagHeartbeats: { [prop: string]: number } = {};
-  private tagSampleTimeoutHandle: any = -1;
-  private zoneSampleTimeoutHandle: any = -1;
-  private checkConnectionIntervalHandle: NodeJS.Timeout;
+  private tagSampleTimeoutHandle: any;
+  private zoneSampleTimeoutHandle: any;
+  private checkConnectionIntervalHandle: any;
   private connectionReady = false;
   private static processInstance: WiserConnector;
   public static events = {
