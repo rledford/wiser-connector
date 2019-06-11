@@ -1,6 +1,6 @@
 'use strict';
 
-const { WiserConnector } = require('../dist');
+const WiserConnector = require('../dist');
 
 const connector = new WiserConnector();
 
