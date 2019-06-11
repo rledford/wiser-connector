@@ -1,6 +1,6 @@
 'use strict';
 
-const WiserConnector = require('../dist');
+const { WiserConnector } = require('../dist');
 
 const connector = new WiserConnector();
 
@@ -20,7 +20,7 @@ const options = {
   tagHeartbeat: TAG_HEARTBEAT || 1000,
   tagSampleRate: TAG_SAMPLE_RATE || 1000,
   zoneSampleRate: ZONE_SAMPLE_RATE || 10000
-}
+};
 
 connector.on('error', err => {
   console.log(err);
@@ -41,5 +41,5 @@ setTimeout(() => {
   connector.shutdown();
   setTimeout(() => {
     connector.start(options);
-  }, 1000)
+  }, 1000);
 }, 10000);
