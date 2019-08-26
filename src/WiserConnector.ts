@@ -181,33 +181,36 @@ export default class WiserConnector extends EventEmitter {
             nextZoneIdList
           );
 
-          transitions.exit.forEach(id => {
-            if (this.trackerZones[id] && this.trackerZones[id].name) {
-              const { name } = this.trackerZones[id];
-              const transition: ZoneTransitionEvent = {
-                tag: tag,
-                zone: { name, id }
-              };
-              this.emitEventMessage(
-                WiserConnector.events.tagExitedZone,
-                transition
-              );
-            }
-          });
-
-          transitions.enter.forEach(id => {
-            if (this.trackerZones[id] && this.trackerZones[id].name) {
-              const { name } = this.trackerZones[id];
-              const transition: ZoneTransitionEvent = {
-                tag: tag,
-                zone: { name, id }
-              };
-              this.emitEventMessage(
-                WiserConnector.events.tagEnteredZone,
-                transition
-              );
-            }
-          });
+          if (transitions.enter.length || transitions.exit.length) {
+            this.tagHeartbeats[tag.tag] = tag.timestamp;
+            transitions.exit.forEach(id => {
+              if (this.trackerZones[id] && this.trackerZones[id].name) {
+                const { name } = this.trackerZones[id];
+                const transition: ZoneTransitionEvent = {
+                  tag: tag,
+                  zone: { name, id }
+                };
+                this.emitEventMessage(
+                  WiserConnector.events.tagExitedZone,
+                  transition
+                );
+              }
+            });
+  
+            transitions.enter.forEach(id => {
+              if (this.trackerZones[id] && this.trackerZones[id].name) {
+                const { name } = this.trackerZones[id];
+                const transition: ZoneTransitionEvent = {
+                  tag: tag,
+                  zone: { name, id }
+                };
+                this.emitEventMessage(
+                  WiserConnector.events.tagEnteredZone,
+                  transition
+                );
+              }
+            });
+          }
 
           Object.assign(this.trackerTags[tag.tag], tag);
 
