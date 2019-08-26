@@ -146,6 +146,14 @@ export default class WiserConnector extends EventEmitter {
       this.zoneSampleRate
     );
   }
+  
+  private createTag(tag: Tag): Tag {
+    const t: Tag = Object.assign({}, tag);
+    t.zones = [];
+    t.timestamp = 0;
+    this.trackerTags[tag.tag] = tag;
+    return t;
+  }
 
   private async sampleTags() {
     if (!this.started || !this.connectionReady) return;
@@ -163,61 +171,57 @@ export default class WiserConnector extends EventEmitter {
       tagReport = uniqueFilterTagReport(tagReport);
 
       tagReport.forEach(tag => {
-        const current: Tag = this.trackerTags[tag.tag];
-        if (current) {
-          const lastZoneIdList: number[] = current.zones.map(z => z.id);
-          const nextZoneIdList: number[] = tag.zones.map(z => z.id);
+        const current: Tag = this.trackerTags[tag.tag] || this.createTag(tag);
+        const lastZoneIdList: number[] = current.zones.map(z => z.id);
+        const nextZoneIdList: number[] = tag.zones.map(z => z.id);
 
-          if (current.timestamp < tag.timestamp) {
-            let transitions = getZoneTransitions(
-              lastZoneIdList,
-              nextZoneIdList
-            );
+        if (current.timestamp < tag.timestamp) {
+          let transitions = getZoneTransitions(
+            lastZoneIdList,
+            nextZoneIdList
+          );
 
-            transitions.exit.forEach(id => {
-              if (this.trackerZones[id] && this.trackerZones[id].name) {
-                const { name } = this.trackerZones[id];
-                const transition: ZoneTransitionEvent = {
-                  tag: tag,
-                  zone: { name, id }
-                };
-                this.emitEventMessage(
-                  WiserConnector.events.tagExitedZone,
-                  transition
-                );
-              }
-            });
-
-            transitions.enter.forEach(id => {
-              if (this.trackerZones[id] && this.trackerZones[id].name) {
-                const { name } = this.trackerZones[id];
-                const transition: ZoneTransitionEvent = {
-                  tag: tag,
-                  zone: { name, id }
-                };
-                this.emitEventMessage(
-                  WiserConnector.events.tagEnteredZone,
-                  transition
-                );
-              }
-            });
-
-            Object.assign(this.trackerTags[tag.tag], tag);
-
-            if (this.tagHeartbeats[tag.tag]) {
-              if (
-                tag.timestamp - this.tagHeartbeats[tag.tag] >=
-                this.tagHeartbeat
-              ) {
-                this.tagHeartbeats[tag.tag] = tag.timestamp;
-                this.emitEventMessage(WiserConnector.events.tagHeartbeat, tag);
-              }
-            } else {
-              this.tagHeartbeats[tag.tag] = tag.timestamp;
+          transitions.exit.forEach(id => {
+            if (this.trackerZones[id] && this.trackerZones[id].name) {
+              const { name } = this.trackerZones[id];
+              const transition: ZoneTransitionEvent = {
+                tag: tag,
+                zone: { name, id }
+              };
+              this.emitEventMessage(
+                WiserConnector.events.tagExitedZone,
+                transition
+              );
             }
+          });
+
+          transitions.enter.forEach(id => {
+            if (this.trackerZones[id] && this.trackerZones[id].name) {
+              const { name } = this.trackerZones[id];
+              const transition: ZoneTransitionEvent = {
+                tag: tag,
+                zone: { name, id }
+              };
+              this.emitEventMessage(
+                WiserConnector.events.tagEnteredZone,
+                transition
+              );
+            }
+          });
+
+          Object.assign(this.trackerTags[tag.tag], tag);
+
+          if (this.tagHeartbeats[tag.tag]) {
+            if (
+              tag.timestamp - this.tagHeartbeats[tag.tag] >=
+              this.tagHeartbeat
+            ) {
+              this.tagHeartbeats[tag.tag] = tag.timestamp;
+              this.emitEventMessage(WiserConnector.events.tagHeartbeat, tag);
+            }
+          } else {
+            this.tagHeartbeats[tag.tag] = tag.timestamp;
           }
-        } else {
-          this.trackerTags[tag.tag] = tag;
         }
       });
     }

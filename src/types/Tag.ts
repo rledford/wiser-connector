@@ -6,7 +6,7 @@ type Tag = {
     y: number;
     z: number;
   };
-  zones: [{ id: number }];
+  zones: {id: number}[];
   battery: number;
   timestamp: number;
 };
