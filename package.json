@@ -1,6 +1,6 @@
 {
   "name": "wiser-connector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Samples data from a Wiser Tracker REST API and reports tag location updates and zone transitions.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
