@@ -9,7 +9,7 @@ Targets ES6+.
 - [Install](#install)
 - [Usage](#usage)
 - [Connector Options](#connector-options)
-- [Tag Properties](#tag-properties)
+- [Tag Report Properties](#tag-report-properties)
 - [Events](#events)
 - [Errors](#errors)
 
@@ -98,7 +98,7 @@ _NOTE_: Zone transitions are ALWAYS reported no matter what the `tagHeartbeat` i
 
 ---
 
-## Tag Properties
+## Tag Report Properties
 
 | Property  | Type       | Description                                                                    |
 | --------- | ---------- | ------------------------------------------------------------------------------ |
@@ -134,7 +134,7 @@ Register for events using the values defined in `WiserConnector.events` or use t
 
 ### tagHeartbeat
 
-Emitted when a tag updates and the time since the last heartbeat is greater than or equal to the configured `tagHeartbeat` value. See [Tag Properties](#tag-properties).
+Emitted when a tag updates and the time since the last heartbeat is greater than or equal to the configured `tagHeartbeat` value. See [Tag Report Properties](#tag-properties).
 
 _TIP_: Setting `tagHeartbeat` to `0` will cause every tag update to be reported.
 
@@ -144,14 +144,14 @@ Emitted when a tag enters or exits a zone. See event data object definition belo
 
 | Property | Type     | Description                                                              |
 | -------- | -------- | ------------------------------------------------------------------------ |
-| `tag`    | `Object` | The raw tag report data for the tag that transitioned zones.             |
+| `report` | `Object` | The tag report for the tag that transitioned zones.                      |
 | `zone`   | `Object` | Contains the Wiser id and name of the zone where the transition occured. |
 
 Example
 
 ```js
 {
-  tag: {
+  report: {
     id: 0,
     tag: 31000,
     location: {x: 0, y: 0, z: 0},
