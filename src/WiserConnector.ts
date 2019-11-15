@@ -146,7 +146,7 @@ export default class WiserConnector extends EventEmitter {
       this.zoneSampleRate
     );
   }
-  
+
   private createTag(tag: Tag): Tag {
     const t: Tag = Object.assign({}, tag);
     t.zones = [];
@@ -170,24 +170,22 @@ export default class WiserConnector extends EventEmitter {
     if (tagReport.length) {
       tagReport = uniqueFilterTagReport(tagReport);
 
-      tagReport.forEach(tag => {
-        const current: Tag = this.trackerTags[tag.tag] || this.createTag(tag);
+      tagReport.forEach(report => {
+        const current: Tag =
+          this.trackerTags[report.tag] || this.createTag(report);
         const lastZoneIdList: number[] = current.zones.map(z => z.id);
-        const nextZoneIdList: number[] = tag.zones.map(z => z.id);
+        const nextZoneIdList: number[] = report.zones.map(z => z.id);
 
-        if (current.timestamp < tag.timestamp) {
-          let transitions = getZoneTransitions(
-            lastZoneIdList,
-            nextZoneIdList
-          );
+        if (current.timestamp < report.timestamp) {
+          let transitions = getZoneTransitions(lastZoneIdList, nextZoneIdList);
 
           if (transitions.enter.length || transitions.exit.length) {
-            this.tagHeartbeats[tag.tag] = tag.timestamp;
+            this.tagHeartbeats[report.tag] = report.timestamp;
             transitions.exit.forEach(id => {
               if (this.trackerZones[id] && this.trackerZones[id].name) {
                 const { name } = this.trackerZones[id];
                 const transition: ZoneTransitionEvent = {
-                  tag: tag,
+                  report: report,
                   zone: { name, id }
                 };
                 this.emitEventMessage(
@@ -196,12 +194,12 @@ export default class WiserConnector extends EventEmitter {
                 );
               }
             });
-  
+
             transitions.enter.forEach(id => {
               if (this.trackerZones[id] && this.trackerZones[id].name) {
                 const { name } = this.trackerZones[id];
                 const transition: ZoneTransitionEvent = {
-                  tag: tag,
+                  report: report,
                   zone: { name, id }
                 };
                 this.emitEventMessage(
@@ -212,18 +210,18 @@ export default class WiserConnector extends EventEmitter {
             });
           }
 
-          Object.assign(this.trackerTags[tag.tag], tag);
+          Object.assign(this.trackerTags[report.tag], report);
 
-          if (this.tagHeartbeats[tag.tag]) {
+          if (this.tagHeartbeats[report.tag]) {
             if (
-              tag.timestamp - this.tagHeartbeats[tag.tag] >=
+              report.timestamp - this.tagHeartbeats[report.tag] >=
               this.tagHeartbeat
             ) {
-              this.tagHeartbeats[tag.tag] = tag.timestamp;
-              this.emitEventMessage(WiserConnector.events.tagHeartbeat, tag);
+              this.tagHeartbeats[report.tag] = report.timestamp;
+              this.emitEventMessage(WiserConnector.events.tagHeartbeat, report);
             }
           } else {
-            this.tagHeartbeats[tag.tag] = tag.timestamp;
+            this.tagHeartbeats[report.tag] = report.timestamp;
           }
         }
       });

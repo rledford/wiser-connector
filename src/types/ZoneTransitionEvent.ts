@@ -1,7 +1,7 @@
 import { Tag } from './Tag';
 
 type ZoneTransitionEvent = {
-  tag: Tag;
+  report: Tag;
   zone: { name: string; id: number };
 };
 
