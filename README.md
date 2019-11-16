@@ -119,7 +119,7 @@ Example:
 {x: 10.2, y: 256.9, z: 34.0}
 ```
 
-The `zones` property is an array of objects which describes which zones the tag is currently in.
+The `zones` property is an array of objects that describe which zones the tag is currently in.
 
 Example:
 
@@ -170,11 +170,11 @@ Example:
 
 ## Methods
 
-| Name     | Args     | Description                                    | Returns                    |
-| -------- | -------- | ---------------------------------------------- | -------------------------- |
-| start    | `Object` | Starts the connector with the provided options | `null`                     |
-| shutdown | `None`   | Shuts down the connector                       | `null`                     |
-| status   | `None`   | Returns the status of the Wiser array hardware | [Arena](#arena-properties) |
+| Name     | Args     | Description                                                                    | Returns                    |
+| -------- | -------- | ------------------------------------------------------------------------------ | -------------------------- |
+| start    | `Object` | Starts the connector with the provided [Connector Options](#connector-options) | `null`                     |
+| shutdown | `None`   | Shuts down the connector                                                       | `null`                     |
+| status   | `None`   | Returns the status of the Wiser array hardware                                 | [Arena](#arena-properties) |
 
 ## Events
 
