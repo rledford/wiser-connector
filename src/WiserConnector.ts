@@ -236,9 +236,17 @@ export default class WiserConnector extends EventEmitter {
   async status() {
     try {
       const status: Arena = await getArena(this);
-      this.emitEventMessage(WiserConnector.events.status, status);
+      if (isChildProcess) {
+        this.emit(WiserConnector.events.status, status);
+      } else {
+        return status;
+      }
     } catch (err) {
-      this.emitEventMessage('error', err);
+      if (isChildProcess) {
+        this.emit(WiserConnector.events.error, err);
+      } else {
+        throw err;
+      }
     }
   }
 
