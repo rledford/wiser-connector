@@ -170,11 +170,57 @@ Example:
 
 ## Methods
 
-| Name     | Args     | Description                                                                    | Returns                    |
-| -------- | -------- | ------------------------------------------------------------------------------ | -------------------------- |
-| start    | `Object` | Starts the connector with the provided [Connector Options](#connector-options) | `null`                     |
-| shutdown | `None`   | Shuts down the connector                                                       | `null`                     |
-| status   | `None`   | Returns the status of the Wiser array hardware                                 | [Arena](#arena-properties) |
+### start
+
+Start the connector with [Connector Options](#connector-options) or, if not provided, use the options passed to the constructor.
+
+```js
+const WiserConnector = require('wiser-connector');
+const options = {
+  hostname: '192.168.1.9',
+  port: 3101,
+  tagHeartbeat: 300000
+};
+
+const connector = new WiserConnector(options);
+connector.start();
+
+// OR
+
+const connector = new WiserConnector();
+connector.start(options);
+```
+
+### shutdown
+
+Shut down the connector.
+
+```js
+connector.shutdown();
+```
+
+### status (async)
+
+Returns a `Promise` that resolves to an [Arena](#arena-properties) object.
+
+```js
+connector
+  .status()
+  .then(arena => {
+    console.log(arena);
+  })
+  .catch(err => {
+    console.log(err.message);
+  });
+
+// OR
+
+try {
+  const arena = await connector.status();
+} catch (err) {
+  console.log(err.message);
+}
+```
 
 ## Events
 
