@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import {
   Arena,
-  Tag,
+  TagReport,
   Zone,
   ZoneTransitionEvent,
   ConnectorOptions
@@ -35,7 +35,7 @@ export default class WiserConnector extends EventEmitter {
   private zoneSampleRate: number;
   private started: boolean = false;
   private checkConnectionLock: boolean = false;
-  private trackerTags: { [prop: string]: Tag } = {};
+  private trackerTags: { [prop: string]: TagReport } = {};
   private trackerZones: Zone[] = [];
   private tagHeartbeats: { [prop: string]: number } = {};
   private tagSampleTimeoutHandle: any;
@@ -147,8 +147,8 @@ export default class WiserConnector extends EventEmitter {
     );
   }
 
-  private createTag(tag: Tag): Tag {
-    const t: Tag = Object.assign({}, tag);
+  private createTag(tag: TagReport): TagReport {
+    const t: TagReport = Object.assign({}, tag);
     t.zones = [];
     t.timestamp = 0;
     this.trackerTags[tag.tag] = tag;
@@ -157,7 +157,7 @@ export default class WiserConnector extends EventEmitter {
 
   private async sampleTags() {
     if (!this.started || !this.connectionReady) return;
-    let tagReport: Tag[] = [];
+    let tagReport: TagReport[] = [];
 
     try {
       tagReport = await getPassiveTagReport(this);
@@ -171,7 +171,7 @@ export default class WiserConnector extends EventEmitter {
       tagReport = uniqueFilterTagReport(tagReport);
 
       tagReport.forEach(report => {
-        const current: Tag =
+        const current: TagReport =
           this.trackerTags[report.tag] || this.createTag(report);
         const lastZoneIdList: number[] = current.zones.map(z => z.id);
         const nextZoneIdList: number[] = report.zones.map(z => z.id);

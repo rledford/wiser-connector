@@ -1,4 +1,4 @@
-type Tag = {
+type TagReport = {
   tag: number;
   error: number;
   location: {
@@ -6,9 +6,9 @@ type Tag = {
     y: number;
     z: number;
   };
-  zones: {id: number}[];
+  zones: { id: number }[];
   battery: number;
   timestamp: number;
 };
 
-export { Tag };
+export { TagReport };

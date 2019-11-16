@@ -4,6 +4,6 @@ export { Adapter } from './Adapter';
 export { Gateway } from './Gateway';
 export { ConnectorOptions } from './ConnectorOptions';
 export { RequestConfig } from './RequestConfig';
-export { Tag } from './Tag';
+export { TagReport } from './TagReport';
 export { Zone } from './Zone';
 export { ZoneTransitionEvent } from './ZoneTransitionEvent';

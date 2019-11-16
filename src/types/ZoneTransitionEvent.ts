@@ -1,7 +1,7 @@
-import { Tag } from './Tag';
+import { TagReport } from './TagReport';
 
 type ZoneTransitionEvent = {
-  report: Tag;
+  report: TagReport;
   zone: { name: string; id: number };
 };
 

@@ -1,6 +1,6 @@
-import { Tag } from './types';
+import { TagReport } from './types';
 
-function uniqueFilterTagReport(tagReport: Tag[]): Tag[] {
+function uniqueFilterTagReport(tagReport: TagReport[]): TagReport[] {
   const result = [];
   let unique: { [prop: string]: boolean } = {};
   tagReport.sort((a, b) => {

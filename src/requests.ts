@@ -1,6 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
-import { Arena, RequestConfig, Zone, Tag } from './types';
+import { Arena, RequestConfig, Zone, TagReport } from './types';
 import WiserConnector from './WiserConnector';
 
 const DEFAULT_TIMEOUT = 5000;
@@ -136,7 +136,7 @@ function isServerAvailable(connector: WiserConnector): Promise<boolean> {
   });
 }
 
-function getPassiveTagReport(connector: WiserConnector): Promise<Tag[]> {
+function getPassiveTagReport(connector: WiserConnector): Promise<TagReport[]> {
   return getJSON({
     method: 'GET',
     hostname: connector.getHostname(),
