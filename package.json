@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "node ./test",
-    "build": "rm -r ./dist; tsc"
+    "build": "tsc"
   },
   "files": [
     "/dist"
@@ -25,7 +25,8 @@
     "asset",
     "rfid",
     "node",
-    "connector"
+    "connector",
+    "iot"
   ],
   "author": "rledford",
   "license": "MIT",
