@@ -58,9 +58,9 @@ export default class WiserConnector extends EventEmitter {
     return WiserConnector.processInstance;
   }
 
-  constructor() {
+  constructor(options: ConnectorOptions = {}) {
     super();
-    Object.assign(this, defaultOptions);
+    Object.assign(this, defaultOptions, options);
   }
 
   getId(): string {
