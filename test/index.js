@@ -38,10 +38,10 @@ connector.on('tagHeartbeat', tag => {
 connector.start();
 
 setTimeout(() => {
-  console.log('SHUTTING DOWN');
   connector.shutdown();
+  console.log('Connector shut down');
   setTimeout(() => {
-    console.log('RESTARTING');
     connector.start(options);
+    console.log('Connector restarted');
   }, 1000);
 }, 10000);
