@@ -109,7 +109,7 @@ _NOTE_: Zone transitions are ALWAYS reported no matter what the `tagHeartbeat` i
 | tag       | `Number`   | An integer used to identify the tag. Usually printed on the tag in hex format. |
 | timestamp | `Number`   | Unix time in milliseconds.                                                     |
 | battery   | `Number`   | The current battery voltage of the tag. Anything below 2.8 is considered low.  |
-| zones     | `[Object]` | A list of zone IDs `{id: number}` that the tag is reported to be in.           |
+| zones     | `Object[]` | A list of zone IDs `{id: number}` that the tag is reported to be in.           |
 
 The location property is an object that contains the x, y, and z coordinates for the tag position.
 
@@ -127,15 +127,54 @@ Example:
 [{ id: 0 }, { id: 1 }, { id: 2 }];
 ```
 
+## Anchor Properties
+
+| Property        | Type      | Description                   |
+| --------------- | --------- | ----------------------------- |
+| id              | `Integer` | Anchor ID                     |
+| hardwareId      | `Integer` | Hardware ID                   |
+| firmwareVersion | `String`  | Firmware version              |
+| x               | `Number`  | X coordinate within the array |
+| y               | `Number`  | Y coordinate within the array |
+| z               | `Number`  | Z coordinate within the array |
+
+## Gateway Properties
+
+| Property | Type      | Description                   |
+| -------- | --------- | ----------------------------- |
+| id       | `Integer` | Gateway ID                    |
+| ipv4     | `String`  | Network IP address            |
+| port     | `Integer` | Network TCP port              |
+| x        | `Number`  | X coordinate within the array |
+| y        | `Number`  | Y coordinate within the array |
+| z        | `Number`  | Z coordinate within the array |
+
+## Adapter Properties
+
+| Property          | Type      | Description            |
+| ----------------- | --------- | ---------------------- |
+| id                | `Integer` | Adapter ID             |
+| usbAnchor         | `Integer` | USB attached anchor ID |
+| downstreamAdapter | `Integer` | Downstream adapter ID  |
+
+## Arena Properties
+
+| Property | Type        | Description                             |
+| -------- | ----------- | --------------------------------------- |
+| panId    | `Integer`   | Unique ID                               |
+| anchors  | `[Anchor]`  | List of [anchors](#anchor-properties)   |
+| gateways | `[Gateway]` | List of [gateways](#gateway-properties) |
+| adapters | `[Adapter]` | List of [adapters](#adapter-properties) |
+
 ---
 
 ## Methods
 
-| Name     | Args   | Description                                    |
-| -------- | ------ | ---------------------------------------------- |
-| start    | Object | Starts the connector with the provided options |
-| shutdown | None   | Shuts down the connector                       |
-| status   | None   | Returns the status of the Wiser array hardware |
+| Name     | Args     | Description                                    | Returns                    |
+| -------- | -------- | ---------------------------------------------- | -------------------------- |
+| start    | `Object` | Starts the connector with the provided options | `null`                     |
+| shutdown | `None`   | Shuts down the connector                       | `null`                     |
+| status   | `None`   | Returns the status of the Wiser array hardware | [Arena](#arena-properties) |
 
 ## Events
 
@@ -179,41 +218,6 @@ Example
 
 ### status
 
-Emitted after a connector's `status` command is executed in a child process. The data contains the current hardware status information returned from the Wiser REST API `/wiser/api/arena` endpoint.
-
-```js
-// Example
-{
-  panId: 0,
-  anchors: [
-    {
-      id: 0,
-      hardwareId: 0,
-      firmwareVersion: '0.0.0',
-      health: 'Alive',
-      x: 0,
-      y: 0,
-      z: 0
-    }
-  ],
-  gateways: [
-    {
-      id: 0,
-      ipv4: '127.0.0.1',
-      port: 3101,
-      x: 0,
-      y: 0,
-      z: 0
-    }
-  ],
-  adapters: [
-    {
-      id: 0,
-      usbAnchor: 0,
-      downstreamAdapter: 0
-    }
-  ]
-}
-```
+Emitted after a connector's `status` command is executed in a child process. The data contains the current hardware status information returned from the Wiser REST API `/wiser/api/arena` endpoint. See [Arena Properties](#arena-properties)
 
 ---
