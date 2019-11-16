@@ -10,6 +10,7 @@ Targets ES6+.
 - [Usage](#usage)
 - [Connector Options](#connector-options)
 - [Tag Report Properties](#tag-report-properties)
+- [Methods](#methods)
 - [Events](#events)
 - [Errors](#errors)
 
@@ -128,6 +129,14 @@ Example:
 
 ---
 
+## Methods
+
+| Name     | Args   | Description                                    |
+| -------- | ------ | ---------------------------------------------- |
+| start    | Object | Starts the connector with the provided options |
+| shutdown | None   | Shuts down the connector                       |
+| status   | None   | Returns the status of the Wiser array hardware |
+
 ## Events
 
 Register for events using the values defined in `WiserConnector.events` or use the event names directly.
@@ -170,7 +179,7 @@ Example
 
 ### status
 
-Emitted after a connector's `status` method or command is executed. The data contains the current hardware status information returned from the Wiser REST API `/wiser/api/arena` endpoint.
+Emitted after a connector's `status` command is executed in a child process. The data contains the current hardware status information returned from the Wiser REST API `/wiser/api/arena` endpoint.
 
 ```js
 // Example
