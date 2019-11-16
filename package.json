@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "node ./test",
-    "build": "tsc"
+    "clean": "node ./clean",
+    "build": "npm run clean && tsc"
   },
   "files": [
     "/dist"
