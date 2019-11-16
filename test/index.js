@@ -2,8 +2,6 @@
 
 const WiserConnector = require('../dist');
 
-const connector = new WiserConnector();
-
 const {
   HOSTNAME,
   PORT,
@@ -22,6 +20,8 @@ const options = {
   zoneSampleRate: ZONE_SAMPLE_RATE || 10000
 };
 
+const connector = new WiserConnector(options);
+
 connector.on('error', err => {
   console.log(err);
 });
@@ -35,11 +35,13 @@ connector.on('tagHeartbeat', tag => {
   console.log('tag heartbeat', tag);
 });
 
-connector.start(options);
+connector.start();
 
 setTimeout(() => {
+  console.log('SHUTTING DOWN');
   connector.shutdown();
   setTimeout(() => {
+    console.log('RESTARTING');
     connector.start(options);
   }, 1000);
 }, 10000);
