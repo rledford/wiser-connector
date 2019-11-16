@@ -29,16 +29,16 @@ npm i -S wiser-connector
 const { WiserConnector } = require('wiser-connector');
 
 // create connector
-const connector = new WiserConnector();
-
-// start the connector
-connector.start({
+const connector = new WiserConnector({
   hostname: '127.0.0.1',
   tagSampleRate: 500, // tag data will be checked every 0.5 seconds
   zoneSampleRate: 30000, // zone data will be checked every 30 seconds
   tagHeartbeat: 1000, // tag updates are reported at most once per second
   port: 3101
 });
+
+// start the connector
+connector.start();
 
 // listen for events
 connector.on(WiserConnector.events.tagHeartbeat, message => {
