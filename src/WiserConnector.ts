@@ -237,7 +237,7 @@ export default class WiserConnector extends EventEmitter {
   }
 
   start(options: ConnectorOptions = {}) {
-    Object.assign(this, defaultOptions, options);
+    Object.assign(this, options);
     if (this.started) {
       return;
     }
