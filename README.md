@@ -49,38 +49,6 @@ connector.on(WiserConnector.events.tagHeartbeat, message => {
 connector.shutdown();
 ```
 
-### Child Process
-
-```js
-// import modules
-const fork = require('child_process').fork;
-const connector = fork('./node_modules/wiser-connector');
-
-// define options
-const options = { hostname: '127.0.0.1', port: 3101 };
-
-// send the start command and options to the connector process
-connector.send({
-  command: 'start',
-  options: options
-});
-
-// listen for events
-connector.on('message', message => {
-  const { event, data } = message;
-  switch (event) {
-    case 'tagHeartbeat': // same as WiserConnector.events.tagHeartbeat
-      console.log(data);
-      break;
-  }
-});
-
-// shutdown the connector
-connector.send({
-  command: 'shutdown'
-});
-```
-
 ---
 
 ## Connector Options
@@ -265,5 +233,27 @@ Example
 ### status
 
 Emitted after a connector's `status` command is executed in a child process. The data contains the current hardware status information returned from the Wiser REST API `/wiser/api/arena` endpoint. See [Arena Properties](#arena-properties)
+
+You can also use _async/await_ or _then/catch_ since the `status` method is asynchronous to get the data without subscribing to the `status` event.
+
+```js
+// .then/.catch
+connector
+  .status()
+  .then(() => {
+    // process arena data
+  })
+  .catch(err => {
+    // handle error
+  });
+
+// async/await
+try {
+  const arena = await connector.status();
+  // process arena data
+} catch (err) {
+  // handle error
+}
+```
 
 ---

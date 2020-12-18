@@ -14,7 +14,6 @@ import {
   isServerAvailable
 } from './requests';
 
-const isChildProcess = typeof process.send === 'function';
 const defaultOptions: ConnectorOptions = {
   id: 'WiserConnector',
   hostname: '127.0.0.1',
@@ -87,14 +86,8 @@ export default class WiserConnector extends EventEmitter {
     if (event === 'error ' && this.listenerCount('error') === 0) {
       return;
     }
-    if (isChildProcess && process.send) {
-      process.send({
-        event,
-        data: message
-      });
-    } else {
-      this.emit(event, message);
-    }
+    
+    this.emit(event, message);
   }
 
   private async checkConnection() {
@@ -236,17 +229,10 @@ export default class WiserConnector extends EventEmitter {
   async status() {
     try {
       const status: Arena = await getArena(this);
-      if (isChildProcess) {
-        this.emit(WiserConnector.events.status, status);
-      } else {
-        return status;
-      }
+      this.emitEventMessage(WiserConnector.events.status, status);
+      return status;
     } catch (err) {
-      if (isChildProcess) {
-        this.emit(WiserConnector.events.error, err);
-      } else {
-        throw err;
-      }
+      throw err;
     }
   }
 
@@ -270,23 +256,4 @@ export default class WiserConnector extends EventEmitter {
     this.connectionReady = false;
     this.started = false;
   }
-}
-
-if (isChildProcess) {
-  const connector = WiserConnector.getProcessInstance();
-  process.on('message', message => {
-    const { command, options } = message;
-    switch (command) {
-      case 'start':
-        connector.start(options);
-        break;
-      case 'status':
-        connector.status();
-      case 'shutdown':
-        connector.shutdown();
-        break;
-      default:
-        this.emitEventMessage('error', `Unknown command [ ${command} ]`);
-    }
-  });
 }
